@@ -1,5 +1,5 @@
 // @name        Hide UI Elements
-// @version     2.2.0
+// @version     2.3.1
 // @description Toggle clutter out of Spotify's now-playing panel and top bar.
 // @author      snackdriven
 //
@@ -31,10 +31,11 @@
         { id: "artist",  label: "About the artist", selector: ".main-nowPlayingView-aboutArtist" },
         { id: "tour",    label: "On tour",          selector: ".main-nowPlayingView-section:has(.main-nowPlayingView-onTourItemGrid)" },
         { id: "queue",   label: "Next in queue",    selector: ".main-nowPlayingView-queue" },
-        // Hides only the label, leaving the icon — turns a 161px button into a 48px one.
-        // Anchored on "> span" rather than the .e-10810-text class, since that encore
-        // version prefix changes between Spotify releases.
-        { id: "videolabel", label: "Video button label", selector: ".main-nowPlayingView-actionButtonShow > span" },
+        // Target the container, not the button. The container also holds a skeleton
+        // placeholder (aria-label="Loading", .actionButtonHidden) that keeps its 109px
+        // even once the button is gone, leaving a hole between cover art and title.
+        // Collapsing the container hands that space back to the track info.
+        { id: "video",   label: "Switch to video",   selector: ".main-nowPlayingView-actionButtonContainer" },
       ],
     },
     {
@@ -48,7 +49,7 @@
   const ALL = GROUPS.reduce((acc, g) => acc.concat(g.elements), []);
 
   // Hidden on a fresh install.
-  const DEFAULTS = ["lyrics", "credits", "studio", "videolabel"];
+  const DEFAULTS = ["lyrics", "credits", "studio", "video"];
 
   const STORAGE_PREFIX = "hide-ui-elements:";
   const STYLE_ID = "hide-ui-elements-style";
@@ -63,6 +64,8 @@
     tour: "hide-npv-sections:tour",
     queue: "hide-npv-sections:queue",
     studio: "hide-studio-button:enabled",
+    // 2.2.0 hid only this button's label; 2.3.0 hides the whole button.
+    video: "hide-ui-elements:videolabel",
   };
 
   function migrate() {

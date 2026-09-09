@@ -15,19 +15,15 @@ Hide UI elements ▸
                    About the artist
                    On tour
                    Next in queue
-                   Video button label
+                   Switch to video
     Top bar     ▸  Studio button
 ```
 
 Tick one and it disappears immediately. No reload, no `spicetify apply`. Your choices persist across
 restarts.
 
-By default it hides Lyrics preview, Credits, the Studio button, and the video button's label.
-Everything else starts visible.
-
-"Video button label" is the odd one out: it hides only the *label* on Spotify's "Switch to video"
-button, leaving the icon. The button still works, it just stops taking 161px to say so — it drops to
-48px.
+By default it hides Lyrics preview, Credits, the Studio button, and Switch to video. Everything else
+starts visible.
 
 ## Install
 
@@ -58,7 +54,7 @@ const GROUPS = [
       { id: "artist",  label: "About the artist", selector: ".main-nowPlayingView-aboutArtist" },
       { id: "tour",    label: "On tour",          selector: ".main-nowPlayingView-section:has(.main-nowPlayingView-onTourItemGrid)" },
       { id: "queue",   label: "Next in queue",    selector: ".main-nowPlayingView-queue" },
-      { id: "videolabel", label: "Video button label", selector: ".main-nowPlayingView-actionButtonShow > span" },
+      { id: "video",   label: "Switch to video",   selector: ".main-nowPlayingView-actionButtonShow" },
     ],
   },
   {
@@ -69,7 +65,7 @@ const GROUPS = [
   },
 ];
 
-const DEFAULTS = ["lyrics", "credits", "studio", "videolabel"];
+const DEFAULTS = ["lyrics", "credits", "studio", "video"];
 ```
 
 ## Picking selectors that survive
