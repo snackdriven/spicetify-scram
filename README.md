@@ -2,9 +2,12 @@
 
 *scram*
 
-Spicetify extension to toggle clutter out of Spotify's now-playing panel and top bar.
+A Spicetify extension for switching off the bits of Spotify's now-playing panel and top bar you
+don't want.
 
-![preview](preview.png)
+<p align="center">
+  <img src="preview.png" width="440" alt="The Hide UI elements submenu, with toggles grouped under Now playing and Top bar">
+</p>
 
 ## Toggles
 
@@ -13,16 +16,16 @@ Spicetify extension to toggle clutter out of Spotify's now-playing panel and top
 | Now playing | Lyrics preview, Credits, About the artist, On tour, Next in queue, Switch to video |
 | Top bar | Studio button |
 
-Found under **Hide UI elements** in the Spicetify menu (profile picture, top right). Changes apply
-instantly and persist across restarts. Lyrics preview, Credits, Studio button and Switch to video are
-hidden by default.
+They live under "Hide UI elements" in the Spicetify menu, behind your profile picture. Ticking one
+takes effect straight away and sticks after a restart. Lyrics preview, Credits, Switch to video and
+the Studio button start off hidden.
 
 ## Install
 
-**Marketplace** — search "Hide UI Elements" under Extensions.
+From Marketplace, search "Hide UI Elements" under Extensions.
 
-**Manual** — drop `hide-ui-elements.js` in `%APPDATA%\spicetify\Extensions`
-(`~/.config/spicetify/Extensions` on Linux/macOS), then:
+By hand, put `hide-ui-elements.js` in `%APPDATA%\spicetify\Extensions` (or
+`~/.config/spicetify/Extensions` on Linux and macOS) and run:
 
 ```
 spicetify config extensions hide-ui-elements.js
@@ -31,7 +34,7 @@ spicetify apply
 
 ## Config
 
-Edit `GROUPS` at the top of the file. A row adds a toggle, a group adds a submenu.
+`GROUPS` sits at the top of the file. A row adds a toggle, a group adds a submenu.
 
 ```js
 { id: "credits", label: "Credits", selector: ".main-nowPlayingView-credits" },
@@ -39,14 +42,14 @@ Edit `GROUPS` at the top of the file. A row adds a toggle, a group adds a submen
 
 ## Notes
 
-- Selectors avoid hashed classes (`y6MSp2Cg3wf9ZqdX`), Encore's version-prefixed ones
-  (`e-10810-text`) and visible text, so they survive updates and non-English clients. Reasoning is in
-  the source comments.
-- "Switch to video" hides its container rather than the button — a `Loading` placeholder alongside it
-  keeps 109px otherwise.
-- Upgrading from v1: delete `hide-npv-sections.js` and `hide-studio-button.js` and drop them from
-  your `extensions =` line. Settings migrate on first run.
-- Built against Spotify 1.2.99.317 / Spicetify 2.44.0. Needs `:has()`.
+- Nothing here anchors on a hashed class like `y6MSp2Cg3wf9ZqdX` or on visible text, so the toggles
+  survive Spotify updates and work in any language. Encore's `e-10810-*` classes look safe but carry
+  a version prefix, so they're out too. The source comments cover each selector.
+- "Switch to video" hides its container instead of the button. A `Loading` placeholder sits beside
+  it holding 109px of its own, so hiding the button alone just leaves a gap.
+- Coming from v1: delete `hide-npv-sections.js` and `hide-studio-button.js`, then take them out of
+  your `extensions =` line. Your settings carry over on first run.
+- Built against Spotify 1.2.99.317 and Spicetify 2.44.0. Needs `:has()`.
 
 ## License
 
