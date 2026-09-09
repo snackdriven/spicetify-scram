@@ -1,9 +1,10 @@
 // @name        Hide UI Elements
-// @version     2.0.0
+// @version     2.1.0
 // @description Toggle clutter out of Spotify's now-playing panel and top bar.
 // @author      snackdriven
 //
-// Toggles live in the Spicetify profile menu under "Hide UI elements".
+// Toggles live in the Spicetify profile menu under "Hide UI elements",
+// grouped by where in the UI each element actually sits.
 // Changes apply instantly — no reload, no `spicetify apply`.
 //
 // Selectors verified against Spotify 1.2.99.317 / Spicetify 2.44.0.
@@ -12,22 +13,35 @@
   "use strict";
 
   // ---------------------------------------------------------------------------
-  // Config — add a row and it becomes a new checkbox.
+  // Config — add an element to a group, or add a whole new group, and the menu
+  // rebuilds itself. Group labels become the nested submenus.
   //
   // Every selector here deliberately avoids two things: hashed class names
   // (EkxD2rdQpMQ0HJha and friends, which change on every Spotify update) and
   // visible text (which breaks the moment you run Spotify in another language).
-  // When an element has only hashed classes of its own, look at its children —
-  // that's how "On tour" and "Studio button" are pinned down.
+  // When an element has only hashed classes of its own, look at its children or
+  // its attributes — that's how "On tour" and "Studio button" are pinned down.
   // ---------------------------------------------------------------------------
-  const ELEMENTS = [
-    { id: "lyrics",  label: "Lyrics preview",   selector: '[data-testid="lyrics-npv-section"]' },
-    { id: "credits", label: "Credits",          selector: ".main-nowPlayingView-credits" },
-    { id: "artist",  label: "About the artist", selector: ".main-nowPlayingView-aboutArtist" },
-    { id: "tour",    label: "On tour",          selector: ".main-nowPlayingView-section:has(.main-nowPlayingView-onTourItemGrid)" },
-    { id: "queue",   label: "Next in queue",    selector: ".main-nowPlayingView-queue" },
-    { id: "studio",  label: "Studio button",    selector: '.main-actionButtons button[aria-haspopup="dialog"]' },
+  const GROUPS = [
+    {
+      label: "Now playing",
+      elements: [
+        { id: "lyrics",  label: "Lyrics preview",   selector: '[data-testid="lyrics-npv-section"]' },
+        { id: "credits", label: "Credits",          selector: ".main-nowPlayingView-credits" },
+        { id: "artist",  label: "About the artist", selector: ".main-nowPlayingView-aboutArtist" },
+        { id: "tour",    label: "On tour",          selector: ".main-nowPlayingView-section:has(.main-nowPlayingView-onTourItemGrid)" },
+        { id: "queue",   label: "Next in queue",    selector: ".main-nowPlayingView-queue" },
+      ],
+    },
+    {
+      label: "Top bar",
+      elements: [
+        { id: "studio",  label: "Studio button",    selector: '.main-actionButtons button[aria-haspopup="dialog"]' },
+      ],
+    },
   ];
+
+  const ALL = GROUPS.reduce((acc, g) => acc.concat(g.elements), []);
 
   // Hidden on a fresh install.
   const DEFAULTS = ["lyrics", "credits", "studio"];
@@ -49,10 +63,10 @@
 
   function migrate() {
     try {
-      ELEMENTS.forEach(el => {
-        const to = STORAGE_PREFIX + el.id;
+      ALL.forEach(el => {
         const from = LEGACY_KEYS[el.id];
         if (!from) return;
+        const to = STORAGE_PREFIX + el.id;
         if (localStorage.getItem(to) === null) {
           const old = localStorage.getItem(from);
           if (old !== null) localStorage.setItem(to, old);
@@ -96,26 +110,31 @@
       style.id = STYLE_ID;
       document.head.appendChild(style);
     }
-    const hidden = ELEMENTS.filter(el => isHidden(el.id)).map(el => el.selector);
+    const hidden = ALL.filter(el => isHidden(el.id)).map(el => el.selector);
     style.textContent = hidden.length
       ? hidden.join(",\n") + " { display: none !important; }"
       : "";
   }
 
   // ---------------------------------------------------------------------------
-  // Menu
+  // Menu — a submenu per group, nested inside one top-level entry. Spicetify
+  // handles SubMenus containing SubMenus fine.
   // ---------------------------------------------------------------------------
 
+  function makeItem(el) {
+    return new Spicetify.Menu.Item(el.label, isHidden(el.id), self => {
+      const next = !isHidden(el.id);
+      setHidden(el.id, next);
+      self.setState(next);
+      applyCSS();
+    });
+  }
+
   function registerMenu() {
-    const items = ELEMENTS.map(el =>
-      new Spicetify.Menu.Item(el.label, isHidden(el.id), self => {
-        const next = !isHidden(el.id);
-        setHidden(el.id, next);
-        self.setState(next);
-        applyCSS();
-      })
+    const groups = GROUPS.map(g =>
+      new Spicetify.Menu.SubMenu(g.label, g.elements.map(makeItem))
     );
-    new Spicetify.Menu.SubMenu(MENU_LABEL, items).register();
+    new Spicetify.Menu.SubMenu(MENU_LABEL, groups).register();
   }
 
   function initMenu() {
