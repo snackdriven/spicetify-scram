@@ -1,8 +1,8 @@
 {
-  "name": "Hide NPV Sections",
-  "description": "Toggle individual sections of Spotify's now-playing panel on and off from the Spicetify menu.",
+  "name": "Hide UI Elements",
+  "description": "Toggle clutter out of Spotify's now-playing panel and top bar from the Spicetify menu.",
   "preview": "preview.png",
-  "main": "hide-npv-sections.js",
+  "main": "hide-ui-elements.js",
   "readme": "README.md",
   "authors": [
     {
