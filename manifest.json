@@ -1,0 +1,14 @@
+{
+  "name": "Hide NPV Sections",
+  "description": "Toggle individual sections of Spotify's now-playing panel on and off from the Spicetify menu.",
+  "preview": "preview.png",
+  "main": "hide-npv-sections.js",
+  "readme": "README.md",
+  "authors": [
+    {
+      "name": "snackdriven",
+      "url": "https://github.com/snackdriven"
+    }
+  ],
+  "tags": ["ui", "customization", "now playing"]
+}
