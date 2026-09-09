@@ -1,6 +1,6 @@
 # Hide UI Elements
 
-*shoo*
+*scram*
 
 Spotify keeps adding things to the now-playing panel and the top bar, and gives you no way to turn
 any of them off. This adds checkboxes.
