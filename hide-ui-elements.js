@@ -1,5 +1,5 @@
 // @name        Hide UI Elements
-// @version     2.1.0
+// @version     2.2.0
 // @description Toggle clutter out of Spotify's now-playing panel and top bar.
 // @author      snackdriven
 //
@@ -31,6 +31,10 @@
         { id: "artist",  label: "About the artist", selector: ".main-nowPlayingView-aboutArtist" },
         { id: "tour",    label: "On tour",          selector: ".main-nowPlayingView-section:has(.main-nowPlayingView-onTourItemGrid)" },
         { id: "queue",   label: "Next in queue",    selector: ".main-nowPlayingView-queue" },
+        // Hides only the label, leaving the icon — turns a 161px button into a 48px one.
+        // Anchored on "> span" rather than the .e-10810-text class, since that encore
+        // version prefix changes between Spotify releases.
+        { id: "videolabel", label: "Video button label", selector: ".main-nowPlayingView-actionButtonShow > span" },
       ],
     },
     {
@@ -44,7 +48,7 @@
   const ALL = GROUPS.reduce((acc, g) => acc.concat(g.elements), []);
 
   // Hidden on a fresh install.
-  const DEFAULTS = ["lyrics", "credits", "studio"];
+  const DEFAULTS = ["lyrics", "credits", "studio", "videolabel"];
 
   const STORAGE_PREFIX = "hide-ui-elements:";
   const STYLE_ID = "hide-ui-elements-style";

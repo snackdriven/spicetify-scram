@@ -15,13 +15,19 @@ Hide UI elements ▸
                    About the artist
                    On tour
                    Next in queue
+                   Video button label
     Top bar     ▸  Studio button
 ```
 
 Tick one and it disappears immediately. No reload, no `spicetify apply`. Your choices persist across
 restarts.
 
-By default it hides Lyrics preview, Credits, and the Studio button. Everything else starts visible.
+By default it hides Lyrics preview, Credits, the Studio button, and the video button's label.
+Everything else starts visible.
+
+"Video button label" is the odd one out: it hides only the *label* on Spotify's "Switch to video"
+button, leaving the icon. The button still works, it just stops taking 161px to say so — it drops to
+48px.
 
 ## Install
 
@@ -52,6 +58,7 @@ const GROUPS = [
       { id: "artist",  label: "About the artist", selector: ".main-nowPlayingView-aboutArtist" },
       { id: "tour",    label: "On tour",          selector: ".main-nowPlayingView-section:has(.main-nowPlayingView-onTourItemGrid)" },
       { id: "queue",   label: "Next in queue",    selector: ".main-nowPlayingView-queue" },
+      { id: "videolabel", label: "Video button label", selector: ".main-nowPlayingView-actionButtonShow > span" },
     ],
   },
   {
@@ -62,7 +69,7 @@ const GROUPS = [
   },
 ];
 
-const DEFAULTS = ["lyrics", "credits", "studio"];
+const DEFAULTS = ["lyrics", "credits", "studio", "videolabel"];
 ```
 
 ## Picking selectors that survive
@@ -83,6 +90,10 @@ picks it out. The Studio button is the only button in `.main-actionButtons` with
 
 An earlier version matched "On tour" by header text and only worked in English. Worth checking the
 descendants before settling for that.
+
+Encore's utility classes carry a version prefix — `e-10810-text`, `e-10810-icon` — which moves when
+Spotify updates Encore. Don't anchor on those either. The video button's label is targeted as
+`> span` for exactly this reason.
 
 ## Upgrading from v1
 
