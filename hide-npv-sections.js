@@ -15,15 +15,16 @@
   // Config — edit this list to add or drop sections.
   //
   //   selector  a CSS selector. Language-independent, survives Spotify updates.
-  //   match     the section's header text. Only for sections Spotify ships with
-  //             no stable class (see "On tour" below). ENGLISH ONLY — if you run
-  //             Spotify in another language, change this string to match.
+  //   match     fallback for a section with no usable class: matches on the
+  //             header text. ENGLISH ONLY, so prefer a selector. Nothing uses
+  //             this right now — "On tour" used to, until its child elements
+  //             turned out to carry stable classes.
   // ---------------------------------------------------------------------------
   const SECTIONS = [
     { id: "lyrics",  label: "Lyrics preview",   selector: '[data-testid="lyrics-npv-section"]' },
     { id: "credits", label: "Credits",          selector: ".main-nowPlayingView-credits" },
     { id: "artist",  label: "About the artist", selector: ".main-nowPlayingView-aboutArtist" },
-    { id: "tour",    label: "On tour",          match: "On tour" },
+    { id: "tour",    label: "On tour",          selector: ".main-nowPlayingView-section:has(.main-nowPlayingView-onTourItemGrid)" },
     { id: "queue",   label: "Next in queue",    selector: ".main-nowPlayingView-queue" },
   ];
 

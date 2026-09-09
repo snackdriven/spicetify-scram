@@ -40,7 +40,7 @@ const SECTIONS = [
   { id: "lyrics",  label: "Lyrics preview",   selector: '[data-testid="lyrics-npv-section"]' },
   { id: "credits", label: "Credits",          selector: ".main-nowPlayingView-credits" },
   { id: "artist",  label: "About the artist", selector: ".main-nowPlayingView-aboutArtist" },
-  { id: "tour",    label: "On tour",          match: "On tour" },
+  { id: "tour",    label: "On tour",          selector: ".main-nowPlayingView-section:has(.main-nowPlayingView-onTourItemGrid)" },
   { id: "queue",   label: "Next in queue",    selector: ".main-nowPlayingView-queue" },
 ];
 
@@ -50,20 +50,20 @@ const DEFAULTS = ["lyrics", "credits"];
 Add a row and it shows up as a new checkbox. `selector` is a plain CSS selector. `match` is the
 fallback for sections Spotify ships with no usable class — see below.
 
-## Known limitation: "On tour"
+## How the selectors hold up
 
-Four of the five sections have a stable class or test id, so they're matched by selector and work
-regardless of what language you run Spotify in.
+All five sections are matched by CSS selector, so the toggles work whatever language you run Spotify
+in.
 
-"On tour" doesn't. Spotify gives it only hashed class names like `y6MSp2Cg3wf9ZqdX`, and those change
-with every update. So this extension finds it by reading the section header text instead, via a
-MutationObserver that stamps `data-hide-npv="tour"` on the matching node.
+"On tour" was the awkward one. Spotify gives the section itself only hashed class names like
+`y6MSp2Cg3wf9ZqdX` that change with every update, so an early version matched it by reading the
+header text — which worked, but only in English. Its *children* turned out to carry stable classes,
+so it now matches on `:has(.main-nowPlayingView-onTourItemGrid)` instead and the language problem
+went away.
 
-That works, but it's English-only. Run Spotify in another language and the toggle quietly stops doing
-anything. Fix is a one-liner: change `match: "On tour"` to whatever your Spotify calls it.
-
-If Spotify ever gives that section a real class, the `match` line can be swapped for a `selector` and
-the problem goes away.
+The `match` field still exists as a fallback for any section that has no usable class. Nothing uses
+it today. If you add one that needs it, know that it's matching on visible text and will only work in
+the language you wrote it for.
 
 ## Compatibility
 
