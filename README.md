@@ -54,7 +54,7 @@ const GROUPS = [
       { id: "artist",  label: "About the artist", selector: ".main-nowPlayingView-aboutArtist" },
       { id: "tour",    label: "On tour",          selector: ".main-nowPlayingView-section:has(.main-nowPlayingView-onTourItemGrid)" },
       { id: "queue",   label: "Next in queue",    selector: ".main-nowPlayingView-queue" },
-      { id: "video",   label: "Switch to video",   selector: ".main-nowPlayingView-actionButtonShow" },
+      { id: "video",   label: "Switch to video",   selector: ".main-nowPlayingView-actionButtonContainer" },
     ],
   },
   {
@@ -88,8 +88,20 @@ An earlier version matched "On tour" by header text and only worked in English. 
 descendants before settling for that.
 
 Encore's utility classes carry a version prefix — `e-10810-text`, `e-10810-icon` — which moves when
-Spotify updates Encore. Don't anchor on those either. The video button's label is targeted as
-`> span` for exactly this reason.
+Spotify updates Encore. They look like real class names, which makes them more dangerous than an
+obvious hash, but they're no more durable. Reach for a structural selector such as `> span` instead.
+
+### Hiding an element isn't always enough
+
+"Switch to video" targets its *container* rather than the button, and that's deliberate. Spotify
+parks a skeleton placeholder beside the real control — a div carrying `aria-label="Loading"` and
+`main-nowPlayingView-actionButtonHidden` — which holds its 109px whether or not the button is there.
+Hide only the button and you're left with a hole between the cover art and the track title.
+
+Collapsing the container gives that width back to the track info, which grows from 160px to 285px.
+Titles stop being truncated as a side effect.
+
+The general point: after hiding something, measure the parent, not just the element you hid.
 
 ## Upgrading from v1
 
