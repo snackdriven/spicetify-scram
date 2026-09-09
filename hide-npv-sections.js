@@ -148,11 +148,26 @@
   }
 
   function initMenu() {
-    if (window.Spicetify && Spicetify.Menu && Spicetify.Menu.SubMenu) {
-      registerMenu();
-    } else {
+    // Every one of these matters. Spicetify.Menu.SubMenu is just a class in the
+    // wrapper, so it exists almost immediately — but register() renders through
+    // Spicetify.ReactJSX, which loads later than Player and Platform do. Check
+    // only the obvious things and register() throws "Cannot read properties of
+    // undefined (reading 'jsx')", the extension keeps running, and the submenu
+    // simply never appears.
+    const ready =
+      window.Spicetify &&
+      Spicetify.Menu &&
+      Spicetify.Menu.SubMenu &&
+      Spicetify.Player &&
+      Spicetify.Platform &&
+      Spicetify.React &&
+      Spicetify.ReactJSX;
+
+    if (!ready) {
       setTimeout(initMenu, 100);
+      return;
     }
+    registerMenu();
   }
 
   initCSS();
