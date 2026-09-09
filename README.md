@@ -2,16 +2,12 @@
 
 *scram*
 
-You did not ask for the lyrics preview. You did not ask to know who produced this track. At some
-point a button appeared in your top bar that says Studio, and you have never once pressed it.
-
-This adds checkboxes.
+Spotify's now playing panel keeps accumulating sections and there's no setting for any of them. This
+adds one. Seven, actually.
 
 <p align="center">
   <img src="preview.png" width="440" alt="The Hide UI elements submenu, with toggles grouped under Now playing and Top bar">
 </p>
-
----
 
 ## What it turns off
 
@@ -20,58 +16,45 @@ This adds checkboxes.
 | Now playing | Lyrics preview, Credits, About the artist, On tour, Next in queue, Switch to video |
 | Top bar | Studio button |
 
-They live under **Hide UI elements** in the Spicetify menu, behind your profile picture. Tick one and
-it's gone. No `spicetify apply`, no restart, no ceremony.
-
-Lyrics preview, Credits, Switch to video and the Studio button start off hidden, on the theory that
-if you went looking for this you probably wanted them gone already.
-
----
+All under **Hide UI elements** in the Spicetify menu, behind your profile picture. Tick one and it's
+gone, no `spicetify apply` and no restart. Lyrics preview, Credits, Switch to video and the Studio
+button are off by default.
 
 ## Install
 
 Marketplace: search "Hide UI Elements" under Extensions.
 
-By hand: drop `hide-ui-elements.js` in `%APPDATA%\spicetify\Extensions`
-(`~/.config/spicetify/Extensions` on Linux and macOS), then
+Or drop `hide-ui-elements.js` in `%APPDATA%\spicetify\Extensions`
+(`~/.config/spicetify/Extensions` on Linux and macOS) and run:
 
 ```
 spicetify config extensions hide-ui-elements.js
 spicetify apply
 ```
 
----
-
 ## Adding your own
 
-`GROUPS` sits at the top of the file. A row adds a toggle, a group adds a submenu.
+`GROUPS` is at the top of the file. A row adds a toggle, a group adds a submenu.
 
 ```js
 { id: "credits", label: "Credits", selector: ".main-nowPlayingView-credits" },
 ```
 
----
+## Selector notes
 
-## Why the selectors look like that
+Some elements get nothing but a generated class name like `y6MSp2Cg3wf9ZqdX`, which lasts until the
+next update. Encore's utility classes have a version number sitting in the middle of them
+(`e-10810-text`), so they're no safer. Matching on visible text breaks as soon as someone runs
+Spotify in French. Nothing here does any of those, and the source comments say what each selector
+keys off instead.
 
-Spotify isn't stopping you doing this. It just makes it irritating.
-
-Some elements get nothing but a generated class name like `y6MSp2Cg3wf9ZqdX`, good until the next
-update and not one minute longer. Encore's utility classes look respectable until you spot the
-version number sitting in the middle of them (`e-10810-text`), at which point they're no better than
-the hash. Matching on visible text works beautifully right up until someone runs Spotify in French.
-Nothing here does any of that, and the source comments say why for each one.
-
-"Switch to video" is the interesting one. Hiding the button leaves a 109px hole between the cover art
-and the track title, because Spotify parks a skeleton placeholder beside it: a div labelled
-`Loading` that holds the space whether or not anything ever loads. So this collapses the whole
-container instead. Track titles stopped getting truncated as a side effect, which was not the plan
-but I'll take it.
+"Switch to video" hides its container rather than the button. Hide just the button and you get a
+109px gap, because there's a skeleton placeholder beside it, a div labelled `Loading`, holding the
+space whether anything loads or not. Collapsing the container hands that width to the track title,
+which stops it being truncated. That part was an accident.
 
 Built against Spotify 1.2.99.317 and Spicetify 2.44.0. Needs `:has()`.
 
----
-
 ## License
 
-MIT. It's seven selectors and a menu. Do what you like with it.
+MIT. Hide whatever you like.
