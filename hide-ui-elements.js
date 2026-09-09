@@ -1,5 +1,5 @@
 // @name        Hide UI Elements
-// @version     2.3.1
+// @version     1.0.0
 // @description Toggle clutter out of Spotify's now-playing panel and top bar.
 // @author      snackdriven
 //
@@ -55,8 +55,8 @@
   const STYLE_ID = "hide-ui-elements-style";
   const MENU_LABEL = "Hide UI elements";
 
-  // v1 shipped as two separate extensions with their own keys. Carry settings
-  // over so upgrading doesn't silently reset anyone's choices.
+  // This started life as two separate extensions with their own storage keys.
+  // Carry those settings over rather than silently resetting them.
   const LEGACY_KEYS = {
     lyrics: "hide-npv-sections:lyrics",
     credits: "hide-npv-sections:credits",
@@ -64,7 +64,7 @@
     tour: "hide-npv-sections:tour",
     queue: "hide-npv-sections:queue",
     studio: "hide-studio-button:enabled",
-    // 2.2.0 hid only this button's label; 2.3.0 hides the whole button.
+    // An earlier build hid only this button's label rather than the whole thing.
     video: "hide-ui-elements:videolabel",
   };
 

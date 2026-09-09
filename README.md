@@ -47,8 +47,6 @@ spicetify apply
   a version prefix, so they're out too. The source comments cover each selector.
 - "Switch to video" hides its container instead of the button. A `Loading` placeholder sits beside
   it holding 109px of its own, so hiding the button alone just leaves a gap.
-- Coming from v1: delete `hide-npv-sections.js` and `hide-studio-button.js`, then take them out of
-  your `extensions =` line. Your settings carry over on first run.
 - Built against Spotify 1.2.99.317 and Spicetify 2.44.0. Needs `:has()`.
 
 ## License
