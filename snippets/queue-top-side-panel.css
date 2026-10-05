@@ -1,0 +1,7 @@
+/* Moves "Next in queue" to the top of the Now Playing view.
+ * Fixed for Spotify 1.3: sections have hashed classes now, so push every section that
+ * has links or a listRow (artist, credits, tour, merch) below the queue. The queue and
+ * the DJ "no queue" notice have neither at the top level, so they stay up top. */
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > div:has(h2):has(a, [data-encore-id="listRow"]):not(:has(> ul)) {
+  order: 99;
+}

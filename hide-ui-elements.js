@@ -1,5 +1,5 @@
 // @name        Hide UI Elements
-// @version     1.2.0
+// @version     1.2.1
 // @description Toggle clutter out of Spotify's now-playing panel and top bar.
 // @author      snackdriven
 //
@@ -7,7 +7,7 @@
 // grouped by where in the UI each element actually sits.
 // Changes apply instantly — no reload, no `spicetify apply`.
 //
-// Selectors verified against Spotify 1.2.99.317 / Spicetify 2.44.0.
+// Selectors verified against Spotify 1.3.3.264 / Spicetify 2.45.3.
 
 (function HideUIElements() {
   "use strict";
@@ -22,27 +22,34 @@
   // When an element has only hashed classes of its own, look at its children or
   // its attributes — that's how "On tour" and "Studio button" are pinned down.
   // ---------------------------------------------------------------------------
+  const PANEL = '.NowPlayingView [data-testid="NPV_Panel_OpenDiv"]';
   const GROUPS = [
     {
       label: "Now playing",
       elements: [
-        { id: "lyrics",  label: "Lyrics preview",   selector: '[data-testid="lyrics-npv-section"]' },
-        { id: "credits", label: "Credits",          selector: ".main-nowPlayingView-credits" },
-        { id: "artist",  label: "About the artist", selector: ".main-nowPlayingView-aboutArtist" },
-        { id: "tour",    label: "On tour",          selector: ".main-nowPlayingView-section:has(.main-nowPlayingView-onTourItemGrid)" },
-        // Merch has nothing but a hashed class, and so does everything inside it.
-        // The product links are the stable part: they all point at shop.spotify.com.
-        { id: "merch",   label: "Merch",            selector: '.main-nowPlayingView-section:has(a[href*="shop.spotify.com"])' },
-        { id: "queue",   label: "Next in queue",    selector: ".main-nowPlayingView-queue" },
+        // Spotify 1.3 hashes nearly every class in the now-playing panel, and the
+        // old .main-nowPlayingView-* names are gone. Sections are direct children of
+        // the panel (data-testid is stable) and get told apart by what's inside them:
+        // a list, a listRow, a link prefix. No visible text, so any UI language works.
+        // Lyrics: Spotify's own preview card, or the Spicy Lyrics card that replaces it.
+        { id: "lyrics",  label: "Lyrics preview",   selector: '#SpicyLyricsNPVCard, [data-testid="lyrics-npv-section"]' },
+        { id: "credits", label: "Credits",          selector: `${PANEL} > div:has([data-encore-id="listRow"]):not(:has(ul))` },
+        { id: "artist",  label: "About the artist", selector: `${PANEL} > div:has(h2):has(a[href^="/artist/"]):not(:has(ul, [data-encore-id="listRow"]))` },
+        { id: "tour",    label: "On tour",          selector: `${PANEL} > div:has(a[href^="/concert/"])` },
+        // Merch's only stable trait is where its product links point.
+        { id: "merch",   label: "Merch",            selector: `${PANEL} > div:has(a[href*="shop.spotify.com"])` },
+        { id: "queue",   label: "Next in queue",    selector: `${PANEL} > div:has(> ul)` },
         // Spotify DJ replaces the queue list with a "The DJ doesn't have a queue"
-        // notice. Same element, so this shares the selector and leans on a
-        // condition to only bite while the DJ is the one picking tracks.
-        { id: "queuedj", label: "DJ \"no queue\" notice", selector: ".main-nowPlayingView-queue", when: "dj" },
+        // notice: a heading and one line of text, no list, links or buttons, which
+        // no other section is. The condition keeps it to DJ playback anyway.
+        { id: "queuedj", label: "DJ \"no queue\" notice", selector: `${PANEL} > div:has(h2):not(:has(a, ul, button, img, [data-encore-id="listRow"]))`, when: "dj" },
         // Target the container, not the button. The container also holds a skeleton
         // placeholder (aria-label="Loading", .actionButtonHidden) that keeps its 109px
         // even once the button is gone, leaving a hole between cover art and title.
         // Collapsing the container hands that space back to the track info.
-        { id: "video",   label: "Switch to video",   selector: ".main-nowPlayingView-actionButtonContainer" },
+        // The art row is [cover, video container (only on video tracks), title info],
+        // so it's the middle child, and only when something follows it.
+        { id: "video",   label: "Switch to video",   selector: `${PANEL} > :first-child > :first-child > :nth-child(2):not(:last-child)` },
       ],
     },
     {

@@ -1,0 +1,6 @@
+/* Removes the "Playing on <device>" strip that causes progress bar displacement.
+ * Fixed for Spotify 1.3: the strip lost its .main-connectBar-connectBar class. It's the
+ * child of the now-playing bar that holds a text-link button. */
+[data-testid="now-playing-bar"] > div:has(> button[data-encore-id="textLink"]) {
+  display: none !important;
+}

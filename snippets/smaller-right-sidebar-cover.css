@@ -1,0 +1,84 @@
+/* Smaller right sidebar cover art, with the track info moved to its right.
+ * Fixed for Spotify 1.3.x, where the old .main-nowPlayingView-* classes are gone.
+ * Spotify now hashes nearly every class name, so this anchors on the two hooks that
+ * survive builds (.NowPlayingView and data-testid) and walks down by position. */
+
+:root {
+  --right-sidebar-cover-art-size: 85px;
+}
+
+/* Row that holds the art block, an optional "Switch to video" button, and the
+ * title/artist block (always last). Grid so the button can sit under the title. */
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child {
+  display: grid !important;
+  grid-template-columns: var(--right-sidebar-cover-art-size) 1fr;
+  align-items: center;
+  column-gap: 12px;
+}
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :last-child {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+}
+/* No video button: center the title block against the whole cover */
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :last-child:nth-child(2) {
+  grid-row: 1 / span 2;
+}
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :nth-child(2):not(:last-child) {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: start;
+}
+
+/* Cover art block (was full width, 1:1) */
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :first-child {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: var(--right-sidebar-cover-art-size) !important;
+  min-width: var(--right-sidebar-cover-art-size) !important;
+  height: var(--right-sidebar-cover-art-size) !important;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+/* The art layer is absolutely positioned and wider than its box; pin it to the new size */
+.NowPlayingView [data-testid="track-visual-enhancement"] {
+  inset: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+.NowPlayingView [data-testid="track-visual-enhancement"] * {
+  max-width: 100%;
+}
+
+/* Spotify swaps in its own mini cover next to the title once the big one shrinks; hide it */
+.NowPlayingView [data-testid="minimized-track-visual-enhancement"] {
+  display: none !important;
+}
+
+/* Original snippet's text sizes: title 1.25rem, artists 0.85rem */
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :last-child > :nth-child(2) > :nth-child(1) a {
+  font-size: 1.25rem !important;
+}
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :last-child > :nth-child(2) > :nth-child(3) a {
+  font-size: 0.85rem !important;
+}
+
+/* The info row carries a dark gradient scrim meant for sitting over the big cover; drop it */
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :last-child::before {
+  display: none !important;
+}
+
+/* On some tracks (playlist/queue contexts) Spotify floats the header over the big cover
+ * (position: absolute, container collapses to 0 height) and pads the cover down with a
+ * 25px margin. With an 85px cover that put the title underneath the header. Keep the
+ * header in normal flow and drop the margin so the row clears it on every track. */
+.NowPlayingView .main-nowPlayingView-headerWrapper {
+  position: relative !important;
+  inset: auto !important;
+}
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :first-child {
+  margin: 0 !important;
+}

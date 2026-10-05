@@ -3,7 +3,7 @@
 *scram*
 
 Spotify's now playing panel keeps accumulating sections and there's no setting for any of them. This
-adds one. Seven, actually.
+adds one. Nine, actually.
 
 <p align="center">
   <img src="preview.png" width="440" alt="The Hide UI elements submenu, with toggles grouped under Now playing and Top bar">
@@ -41,7 +41,7 @@ spicetify apply
 `GROUPS` is at the top of the file. A row adds a toggle, a group adds a submenu.
 
 ```js
-{ id: "credits", label: "Credits", selector: ".main-nowPlayingView-credits" },
+{ id: "credits", label: "Credits", selector: `${PANEL} > div:has([data-encore-id="listRow"]):not(:has(ul))` },
 ```
 
 Add `when: "<condition>"` and the rule only applies while that condition holds. `CONDITIONS` sits
@@ -49,7 +49,7 @@ just below `GROUPS`: each one stamps true/false on `<html>` and the generated CS
 attribute, so reacting to playback is one attribute write rather than a stylesheet rebuild.
 
 ```js
-{ id: "queuedj", label: "DJ \"no queue\" notice", selector: ".main-nowPlayingView-queue", when: "dj" },
+{ id: "queuedj", label: "DJ \"no queue\" notice", selector: `${PANEL} > div:has(> ul)`, when: "dj" },
 ```
 
 ## Selector notes
@@ -72,7 +72,30 @@ The `dj` condition reads `agentic_product_type` out of the playback context's me
 own wording is English-only and the DJ playlist id is a hardcoded id Spotify can rotate, so neither
 is worth keying off.
 
-Built against Spotify 1.2.99.317 and Spicetify 2.45.1. Needs `:has()`.
+Built against Spotify 1.3.3.264 and Spicetify 2.45.3. Needs `:has()`.
+
+Spotify 1.3 hashed the old `.main-nowPlayingView-*` classes, which is what broke every selector in
+1.2.0 except the Studio button. Sections are now matched by what's inside them under the panel's
+`data-testid`: a `ul` for the queue, a `listRow` for credits, `/concert/` links for On tour, a
+heading with plain text and nothing else for the DJ notice. "Switch to video" is the middle child of
+the cover row, and only when something follows it. Every toggle was checked live on 1.3.3, DJ
+playback and a video track included.
+
+## Snippets
+
+`snippets/` holds CSS repairs for Marketplace snippets that died on Spotify 1.3, plus one fix for a
+theme problem. Paste the contents into Marketplace's custom CSS, or install them from the folder.
+
+| File | What it does |
+|---|---|
+| `smaller-right-sidebar-cover.css` | 85px Now Playing cover with the title and artist beside it. Handles video tracks, and the tracks where Spotify floats the header over the cover. |
+| `queue-top-side-panel.css` | Moves Next in queue above the other sections. |
+| `remove-connect-bar.css` | Hides the "Playing on <device>" strip. |
+| `menu-blur-fix.css` | The profile and right-click menus were see-through under the Lucid theme. Its blur rules stopped matching, so this puts the blur back and firms up the fill. |
+
+All four were tested on 1.3.3. The same caveat applies as above: a future Spotify update can hash
+something new, and these anchor on `.NowPlayingView`, `data-testid` and `role="menu"` because
+those have survived so far.
 
 ## License
 

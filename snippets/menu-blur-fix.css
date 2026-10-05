@@ -1,0 +1,10 @@
+/* Profile menu, right-click menus and submenus were see-through on Spotify 1.3.
+ * The Lucid theme makes them 50% transparent and relies on backdrop-filter rules aimed
+ * at .main-contextMenu-tippy and old hashed classes, which no longer match anything,
+ * so the blur was lost and text read straight through to the page behind. Menus are
+ * ul[role="menu"] now. This restores the blur and firms up the fill. */
+ul[role="menu"] {
+  background-color: rgba(var(--clr-surface-1-rgb, 29, 26, 34), 0.85) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  backdrop-filter: blur(16px) saturate(1.5);
+}
