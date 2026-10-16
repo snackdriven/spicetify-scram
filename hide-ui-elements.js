@@ -1,5 +1,5 @@
 // @name        Hide UI Elements
-// @version     1.3.0
+// @version     1.3.1
 // @description Toggle clutter out of Spotify's now-playing panel and top bar.
 // @author      snackdriven
 //
@@ -206,15 +206,16 @@
       style.id = STYLE_ID;
       document.head.appendChild(style);
     }
+    const baseCSS = 'ul[role="menu"]:has([data-tippy-root]) { overflow: visible !important; }';
     if (!isEnabled()) {
-      style.textContent = "";
+      style.textContent = baseCSS;
       return;
     }
     const hidden = ALL.filter(el => isHidden(el.id))
                       .map(el => guardFor(el) + el.selector);
     style.textContent = hidden.length
-      ? hidden.join(",\n") + " { display: none !important; }"
-      : "";
+      ? baseCSS + "\n" + hidden.join(",\n") + " { display: none !important; }"
+      : baseCSS;
   }
 
   // ---------------------------------------------------------------------------
@@ -244,6 +245,89 @@
     new Spicetify.Menu.SubMenu(MENU_LABEL, [masterToggle].concat(groups)).register();
   }
 
+  // Spicetify 2.45.2-2.45.3 on Spotify 1.3.3+ resolves Spicetify.ReactComponent.MenuItem
+  // to the V2-only React Aria MenuItem render function instead of the layout-switching
+  // MenuItem wrapper (which forwards "aria-describedby"). When the profile menu renders
+  // in legacy mode, the V2-only MenuItem throws "cannot be rendered outside a collection."
+  // and crashes the profile menu ErrorBoundary. Also defaults profile-menu submenus to
+  // "left-start" so nested submenus cascade cleanly to the left of the profile menu.
+  function repairSpicetifyMenuItem() {
+    const rc = Spicetify.ReactComponent;
+    if (!rc) return;
+    try {
+      const origSub = rc.MenuSubMenuItem;
+      if (typeof origSub === "function" && !origSub._scramLeftCascade) {
+        const wrappedSub = function (props) {
+          const ctx =
+            (Spicetify.ContextMenuV2 &&
+              Spicetify.ContextMenuV2._context &&
+              Spicetify.React.useContext(Spicetify.ContextMenuV2._context)) ||
+            {};
+          const isProfileMenu =
+            ctx.target &&
+            typeof ctx.target.getAttribute === "function" &&
+            ctx.target.getAttribute("data-testid") === "user-widget-link";
+          const nextProps = isProfileMenu
+            ? Object.assign({}, props, { placement: "left-start" })
+            : props;
+          return origSub(nextProps);
+        };
+        wrappedSub._scramLeftCascade = true;
+        rc.MenuSubMenuItem = wrappedSub;
+      }
+
+      const current = rc.MenuItem;
+      if (!current) return;
+      if (Function.prototype.toString.call(current).includes("aria-describedby")) return;
+      const chunkHolder =
+        window.rspackChunk ||
+        window.rspackChunkclient_web ||
+        window.webpackChunkclient_web;
+      if (!chunkHolder || typeof chunkHolder.push !== "function") return;
+      let req;
+      chunkHolder.push([[Symbol()], {}, r => { req = r; }]);
+      if (!req || !req.m) return;
+      for (const id of Object.keys(req.m)) {
+        const factory = req.m[id];
+        if (!factory) continue;
+        let fStr = "";
+        try { fStr = Function.prototype.toString.call(factory); } catch (_) { continue; }
+        if (
+          !fStr.includes("forceV2LeadingIcon") ||
+          !fStr.includes("showFullTextOnHover") ||
+          !fStr.includes("aria-describedby")
+        ) {
+          continue;
+        }
+        let mod;
+        try { mod = req(id); } catch (_) { continue; }
+        if (!mod || typeof mod !== "object") continue;
+        let vals = [];
+        try { vals = Object.values(mod); } catch (_) { continue; }
+        const match = vals.find(v => {
+          if (typeof v !== "function") return false;
+          try {
+            const s = Function.prototype.toString.call(v);
+            return (
+              s.includes("forceV2LeadingIcon") &&
+              s.includes("showFullTextOnHover") &&
+              s.includes("menuAction") &&
+              s.includes("aria-describedby")
+            );
+          } catch (_) {
+            return false;
+          }
+        });
+        if (match) {
+          rc.MenuItem = match;
+          return;
+        }
+      }
+    } catch (_) {
+      // Ignore introspection errors
+    }
+  }
+
   function initMenu() {
     // register() renders through Spicetify.ReactJSX, which loads later than
     // Player and Platform. Register before it exists and you get "Cannot read
@@ -257,12 +341,15 @@
       Spicetify.Player &&
       Spicetify.Platform &&
       Spicetify.React &&
-      Spicetify.ReactJSX;
+      Spicetify.ReactJSX &&
+      Spicetify.ReactComponent &&
+      Spicetify.ReactComponent.MenuItem;
 
     if (!ready) {
       setTimeout(initMenu, 100);
       return;
     }
+    repairSpicetifyMenuItem();
     registerMenu();
     syncConditions();
     Object.keys(CONDITIONS).forEach(key => {

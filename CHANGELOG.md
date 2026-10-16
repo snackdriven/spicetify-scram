@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-10-16
+
+### Fixed
+
+- **User profile menu crash on Spotify 1.3.5 / Spicetify 2.45.2+ (`cannot be rendered outside a collection`)**: Spicetify's `MenuItem` module finder matches Spotify's V2-only React Aria `MenuItem` render function before reaching the layout-switching `MenuItem` wrapper, crashing the profile menu `ErrorBoundary` whenever the menu renders in legacy layout. `hide-ui-elements.js` now detects and repairs `Spicetify.ReactComponent.MenuItem` at boot before any menu opens.
+- **Profile menu submenus clipped or opening over the parent menu**:
+  - `hide-ui-elements.js` now sets `overflow: visible !important` on `ul[role="menu"]:has([data-tippy-root])` and defaults submenus inside the user profile menu to `placement: "left-start"` so **Hide UI elements** -> **Now playing** / **Top bar** cascade cleanly to the left.
+  - `snippets/menu-blur-fix.css` now applies `backdrop-filter: blur(16px) saturate(1.5)` on `ul[role="menu"]::before` with `overflow: visible !important` so the parent `ul[role="menu"]` does not become a clipping containing block or suppress nested submenu blur in Chromium.
+
 ## [1.3.0] - 2026-10-16
 
 ### Added
@@ -55,7 +64,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 - Wait for `Spicetify.ReactJSX` before registering the menu so `SubMenu.register()` never fails silently on cold start.
 - Collapse the full "Switch to video" container rather than only the button so the adjacent `Loading` placeholder does not leave a 109px gap beside the cover art.
 
-[Unreleased]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/snackdriven/spicetify-scram/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/snackdriven/spicetify-scram/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/snackdriven/spicetify-scram/compare/v1.0.0...v1.2.0

@@ -2,9 +2,27 @@
  * The Lucid theme makes them 50% transparent and relies on backdrop-filter rules aimed
  * at .main-contextMenu-tippy and old hashed classes, which no longer match anything,
  * so the blur was lost and text read straight through to the page behind. Menus are
- * ul[role="menu"] now. This restores the blur and firms up the fill. */
+ * ul[role="menu"] now.
+ *
+ * Putting backdrop-filter directly on ul[role="menu"] turns the scroll container into a
+ * containing block that clips child [data-tippy-root] submenus and suppresses nested
+ * backdrop-filter blurs in Chromium. Applying the blur on ::before with overflow: visible
+ * keeps every menu and nested submenu blurred and unclipped. */
 ul[role="menu"] {
-  background-color: rgba(var(--clr-surface-1-rgb, 29, 26, 34), 0.85) !important;
+  position: relative;
+  z-index: 0;
+  overflow: visible !important;
+  background-color: rgba(var(--clr-surface-1-rgb, 29, 26, 34), 0.88) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+ul[role="menu"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
   -webkit-backdrop-filter: blur(16px) saturate(1.5);
   backdrop-filter: blur(16px) saturate(1.5);
+  pointer-events: none;
 }
