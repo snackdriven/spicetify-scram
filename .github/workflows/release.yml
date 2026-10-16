@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to (re)publish, e.g. v1.3.0"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Verify version and publish GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Resolve version and verify @version header
+        id: ver
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            REF="${{ github.event.inputs.tag }}"
+          else
+            REF="${GITHUB_REF#refs/tags/}"
+          fi
+          VERSION="${REF#v}"
+          HEADER_VER="$(sed -n 's/^\/\/ @version[[:space:]]*\([^[:space:]]*\).*$/\1/p' hide-ui-elements.js | head -n 1)"
+          if [ "$HEADER_VER" != "$VERSION" ]; then
+            echo "Error: hide-ui-elements.js @version ($HEADER_VER) does not match tag version ($VERSION)" >&2
+            exit 1
+          fi
+          echo "tag=$REF" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Extract changelog section
+        id: changelog
+        run: |
+          VERSION="${{ steps.ver.outputs.version }}"
+          if [ -f CHANGELOG.md ]; then
+            awk -v v="$VERSION" '
+              $0 ~ "^## \\[" v "\\]" { in_section=1; next }
+              in_section && (/^## \[/ || /^\[Unreleased\]:/) { exit }
+              in_section { print }
+            ' CHANGELOG.md > release-notes.md
+          else
+            : > release-notes.md
+          fi
+          if [ -s release-notes.md ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create or update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: ${{ steps.ver.outputs.tag }}
+          body_path: ${{ steps.changelog.outputs.found == 'true' && 'release-notes.md' || '' }}
+          generate_release_notes: ${{ steps.changelog.outputs.found != 'true' }}
+          files: |
+            hide-ui-elements.js
