@@ -1,0 +1,13 @@
+/* Keeps the seekbar duration readout anchored in the bottom playback bar on Spotify 1.3.5.
+ * Themes like Spotify Spice set position: absolute; top: 5px; left: 50% on
+ * [data-testid="playback-duration"], expecting .playback-bar to have position: relative.
+ * Spotify 1.3.5 hashed .playback-bar, so the duration floats up to the top window bar
+ * over the search box unless reset to normal flex flow. */
+[data-testid="playback-duration"] {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  height: 1lh !important;
+  line-height: normal !important;
+  transform: none !important;
+}

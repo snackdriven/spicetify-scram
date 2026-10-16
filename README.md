@@ -17,8 +17,9 @@ adds one. Nine, actually.
 | Top bar | Studio button |
 
 All under **Hide UI elements** in the Spicetify menu, behind your profile picture. Tick one and it's
-gone, no `spicetify apply` and no restart. Lyrics preview, Credits, Switch to video and the Studio
-button are off by default, as are Merch and the DJ notice.
+gone, no `spicetify apply` and no restart. Use **Enabled** at the top of the submenu to toggle all
+hiding off and back on at once without losing your individual selections. Lyrics preview, Credits,
+Switch to video and the Studio button are off by default, as are Merch and the DJ notice.
 
 The DJ toggle is the odd one out: it hides the "The DJ doesn't have a queue" panel while Spotify DJ
 is playing, and leaves the normal Next in queue list alone the rest of the time. Same element, two
@@ -60,8 +61,9 @@ next update. Encore's utility classes have a version number sitting in the middl
 Spotify in French. Nothing here does any of those, and the source comments say what each selector
 keys off instead.
 
-Merch keys off its product links pointing at `shop.spotify.com`. The section itself and every
-element inside it carry hashed classes only, so there was nothing else to hold on to.
+Merch keys off its product links pointing at `shop.spotify.com`. On 1.3.5 Merch also renders a
+direct `> ul` just like Next in queue, so the queue selector explicitly excludes `shop.spotify.com`
+links to keep the two toggles independent.
 
 "Switch to video" hides its container rather than the button. Hide just the button and you get a
 109px gap, because there's a skeleton placeholder beside it, a div labelled `Loading`, holding the
@@ -72,19 +74,19 @@ The `dj` condition reads `agentic_product_type` out of the playback context's me
 own wording is English-only and the DJ playlist id is a hardcoded id Spotify can rotate, so neither
 is worth keying off.
 
-Built against Spotify 1.3.3.264 and Spicetify 2.45.3. Needs `:has()`.
+Built against Spotify 1.3.5.3058 and Spicetify 2.45.3. Needs `:has()`.
 
-Spotify 1.3 hashed the old `.main-nowPlayingView-*` classes, which is what broke every selector in
-1.2.0 except the Studio button. Sections are now matched by what's inside them under the panel's
-`data-testid`: a `ul` for the queue, a `listRow` for credits, `/concert/` links for On tour, a
-heading with plain text and nothing else for the DJ notice. "Switch to video" is the middle child of
-the cover row, and only when something follows it. Every toggle was checked live on 1.3.3, DJ
-playback and a video track included.
+Spotify 1.3 hashed the old `.main-nowPlayingView-*` and `.main-actionButtons` classes. Sections are
+matched by what's inside them under the panel's `data-testid`: a `ul` (without shop links) for the
+queue, a `listRow` for credits, `/concert/` links for On tour, a heading with plain text and nothing
+else for the DJ notice. "Switch to video" is the middle child of the cover row, and only when
+something follows it. The Studio button is matched as the dialog trigger inside `#global-nav-bar`
+(along with its wrapper `span` so no flex gap stays behind).
 
 ## Snippets
 
-`snippets/` holds CSS repairs for Marketplace snippets that died on Spotify 1.3, plus one fix for a
-theme problem. Paste the contents into Marketplace's custom CSS, or install them from the folder.
+`snippets/` holds CSS repairs for Marketplace snippets and themes that broke on Spotify 1.3.x.
+Paste the contents into Marketplace's custom CSS, or install them from the folder.
 
 | File | What it does |
 |---|---|
@@ -92,10 +94,17 @@ theme problem. Paste the contents into Marketplace's custom CSS, or install them
 | `queue-top-side-panel.css` | Moves Next in queue above the other sections. |
 | `remove-connect-bar.css` | Hides the "Playing on <device>" strip. |
 | `menu-blur-fix.css` | The profile and right-click menus were see-through under the Lucid theme. Its blur rules stopped matching, so this puts the blur back and firms up the fill. |
+| `playback-duration-fix.css` | Keeps `[data-testid="playback-duration"]` anchored in the seekbar when themes like Spotify Spice position it absolutely against the now-hashed `.playback-bar`. |
 
-All four were tested on 1.3.3. The same caveat applies as above: a future Spotify update can hash
+All five were tested on 1.3.5. The same caveat applies as above: a future Spotify update can hash
 something new, and these anchor on `.NowPlayingView`, `data-testid` and `role="menu"` because
 those have survived so far.
+
+## Versioning
+
+Releases follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (`@version` in
+`hide-ui-elements.js` and `vX.Y.Z` Git tags). Notable changes are tracked in
+[CHANGELOG.md](CHANGELOG.md) per [CHANGELOG-STANDARDS.md](CHANGELOG-STANDARDS.md).
 
 ## License
 

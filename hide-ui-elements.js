@@ -1,5 +1,5 @@
 // @name        Hide UI Elements
-// @version     1.2.1
+// @version     1.3.0
 // @description Toggle clutter out of Spotify's now-playing panel and top bar.
 // @author      snackdriven
 //
@@ -7,7 +7,7 @@
 // grouped by where in the UI each element actually sits.
 // Changes apply instantly — no reload, no `spicetify apply`.
 //
-// Selectors verified against Spotify 1.3.3.264 / Spicetify 2.45.3.
+// Selectors verified against Spotify 1.3.5.3058 / Spicetify 2.45.3.
 
 (function HideUIElements() {
   "use strict";
@@ -38,7 +38,8 @@
         { id: "tour",    label: "On tour",          selector: `${PANEL} > div:has(a[href^="/concert/"])` },
         // Merch's only stable trait is where its product links point.
         { id: "merch",   label: "Merch",            selector: `${PANEL} > div:has(a[href*="shop.spotify.com"])` },
-        { id: "queue",   label: "Next in queue",    selector: `${PANEL} > div:has(> ul)` },
+        // Merch also uses a direct > ul on 1.3.5, so exclude shop.spotify.com links.
+        { id: "queue",   label: "Next in queue",    selector: `${PANEL} > div:has(> ul):not(:has(a[href*="shop.spotify.com"]))` },
         // Spotify DJ replaces the queue list with a "The DJ doesn't have a queue"
         // notice: a heading and one line of text, no list, links or buttons, which
         // no other section is. The condition keeps it to DJ playback anyway.
@@ -55,7 +56,9 @@
     {
       label: "Top bar",
       elements: [
-        { id: "studio",  label: "Studio button",    selector: '.main-actionButtons button[aria-haspopup="dialog"]' },
+        // Spotify 1.3.5 hashed .main-actionButtons; Studio is the only dialog button
+        // in #global-nav-bar, wrapped in a <span> whose flex gap lingers unless hidden too.
+        { id: "studio",  label: "Studio button",    selector: '#global-nav-bar :has(> button[aria-haspopup="dialog"]), #global-nav-bar button[aria-haspopup="dialog"], .main-actionButtons button[aria-haspopup="dialog"]' },
       ],
     },
   ];
@@ -121,6 +124,7 @@
   const DEFAULTS = ["lyrics", "credits", "studio", "video", "queuedj", "merch"];
 
   const STORAGE_PREFIX = "hide-ui-elements:";
+  const ENABLED_KEY = STORAGE_PREFIX + "enabled";
   const STYLE_ID = "hide-ui-elements-style";
   const MENU_LABEL = "Hide UI elements";
 
@@ -158,6 +162,22 @@
   // State
   // ---------------------------------------------------------------------------
 
+  function isEnabled() {
+    try {
+      return localStorage.getItem(ENABLED_KEY) !== "false";
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function setEnabled(value) {
+    try {
+      localStorage.setItem(ENABLED_KEY, String(value));
+    } catch (e) {
+      // Blocked storage — the toggle still works for this session.
+    }
+  }
+
   function isHidden(id) {
     try {
       const stored = localStorage.getItem(STORAGE_PREFIX + id);
@@ -186,6 +206,10 @@
       style.id = STYLE_ID;
       document.head.appendChild(style);
     }
+    if (!isEnabled()) {
+      style.textContent = "";
+      return;
+    }
     const hidden = ALL.filter(el => isHidden(el.id))
                       .map(el => guardFor(el) + el.selector);
     style.textContent = hidden.length
@@ -194,8 +218,8 @@
   }
 
   // ---------------------------------------------------------------------------
-  // Menu — a submenu per group, nested inside one top-level entry. Spicetify
-  // handles SubMenus containing SubMenus fine.
+  // Menu — a master toggle plus a submenu per group, nested inside one
+  // top-level entry. Spicetify handles SubMenus containing SubMenus fine.
   // ---------------------------------------------------------------------------
 
   function makeItem(el) {
@@ -208,10 +232,16 @@
   }
 
   function registerMenu() {
+    const masterToggle = new Spicetify.Menu.Item("Enabled", isEnabled(), self => {
+      const next = !isEnabled();
+      setEnabled(next);
+      self.setState(next);
+      applyCSS();
+    });
     const groups = GROUPS.map(g =>
       new Spicetify.Menu.SubMenu(g.label, g.elements.map(makeItem))
     );
-    new Spicetify.Menu.SubMenu(MENU_LABEL, groups).register();
+    new Spicetify.Menu.SubMenu(MENU_LABEL, [masterToggle].concat(groups)).register();
   }
 
   function initMenu() {
