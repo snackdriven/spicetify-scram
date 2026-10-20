@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Commitizen commit prompts, SemVer release preparation and CI checks for commit titles and curated release notes.
+
+
 ## [1.3.1] - 2026-10-16
 
 ### Fixed
