@@ -109,3 +109,7 @@ Releases follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (`@ve
 ## License
 
 MIT. Hide whatever you like.
+
+## Commits and releases
+
+See [RELEASE.md](RELEASE.md) for Commitizen commands, SemVer and changelog maintenance.
