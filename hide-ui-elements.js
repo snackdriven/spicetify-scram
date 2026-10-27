@@ -1,5 +1,5 @@
 // @name        Hide UI Elements
-// @version     1.3.1
+// @version     1.3.2
 // @description Toggle clutter out of Spotify's now-playing panel and top bar.
 // @author      snackdriven
 //
@@ -7,7 +7,7 @@
 // grouped by where in the UI each element actually sits.
 // Changes apply instantly — no reload, no `spicetify apply`.
 //
-// Selectors verified against Spotify 1.3.5.3058 / Spicetify 2.45.3.
+// Selectors verified against Spotify 1.3.6.1921 / Spicetify 2.46.1.
 
 (function HideUIElements() {
   "use strict";
@@ -22,35 +22,43 @@
   // When an element has only hashed classes of its own, look at its children or
   // its attributes — that's how "On tour" and "Studio button" are pinned down.
   // ---------------------------------------------------------------------------
-  const PANEL = '.NowPlayingView [data-testid="NPV_Panel_OpenDiv"]';
+  // Spotify 1.3.6 replaced .NowPlayingView / [data-testid="NPV_Panel_OpenDiv"]
+  // with NowPlayingViewV2 ([data-npv-root]). Keep the V1 path alongside V2 so
+  // both layouts work across 1.3.x builds and rollout flags.
+  const PANEL = '[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2)';
+  const PANEL_V1 = '.NowPlayingView [data-testid="NPV_Panel_OpenDiv"]';
   const GROUPS = [
     {
       label: "Now playing",
       elements: [
         // Spotify 1.3 hashes nearly every class in the now-playing panel, and the
-        // old .main-nowPlayingView-* names are gone. Sections are direct children of
-        // the panel (data-testid is stable) and get told apart by what's inside them:
-        // a list, a listRow, a link prefix. No visible text, so any UI language works.
+        // old .main-nowPlayingView-* names are gone. In 1.3.6 ([data-npv-root]),
+        // dynamic cards sit inside a middle wrapper (${PANEL} > div) and Next in
+        // queue sits in ${PANEL} > div:last-child, so sections get told apart by
+        // what's inside them: a listRow, a link prefix, an img. No visible text,
+        // so any UI language works.
         // Lyrics: Spotify's own preview card, or the Spicy Lyrics card that replaces it.
         { id: "lyrics",  label: "Lyrics preview",   selector: '#SpicyLyricsNPVCard, [data-testid="lyrics-npv-section"]' },
-        { id: "credits", label: "Credits",          selector: `${PANEL} > div:has([data-encore-id="listRow"]):not(:has(ul))` },
-        { id: "artist",  label: "About the artist", selector: `${PANEL} > div:has(h2):has(a[href^="/artist/"]):not(:has(ul, [data-encore-id="listRow"]))` },
-        { id: "tour",    label: "On tour",          selector: `${PANEL} > div:has(a[href^="/concert/"])` },
+        // In 1.3.6 Credits is a <section> with listRows and no images (unlike
+        // RelatedAudioTracksSection and NextInQueueSection, whose rows carry cover art).
+        { id: "credits", label: "Credits",          selector: `${PANEL} > div > section:has([data-encore-id="listRow"]):not(:has(img)), ${PANEL_V1} > div:has([data-encore-id="listRow"]):not(:has(ul))` },
+        // Exclude [role="presentation"] so RelatedVideosCarousel (which also links to /artist/) doesn't match.
+        { id: "artist",  label: "About the artist", selector: `${PANEL} > div > div:has(h2):has(a[href^="/artist/"]):not(:has(ul, [data-encore-id="listRow"], [role="presentation"])), ${PANEL_V1} > div:has(h2):has(a[href^="/artist/"]):not(:has(ul, [data-encore-id="listRow"]))` },
+        { id: "tour",    label: "On tour",          selector: `${PANEL} > div > div:has(a[href^="/concert/"]), ${PANEL_V1} > div:has(a[href^="/concert/"])` },
         // Merch's only stable trait is where its product links point.
-        { id: "merch",   label: "Merch",            selector: `${PANEL} > div:has(a[href*="shop.spotify.com"])` },
-        // Merch also uses a direct > ul on 1.3.5, so exclude shop.spotify.com links.
-        { id: "queue",   label: "Next in queue",    selector: `${PANEL} > div:has(> ul):not(:has(a[href*="shop.spotify.com"]))` },
+        { id: "merch",   label: "Merch",            selector: `${PANEL} > div > div:has(a[href*="shop.spotify.com"]), ${PANEL_V1} > div:has(a[href*="shop.spotify.com"])` },
+        // 1.3.6 dropped the <ul> from Next in queue: it's the static wrapper
+        // (${PANEL} > div:last-child) holding either track listRows or an empty-queue
+        // /search link. Hide the wrapper itself so no 16px flex gap stays behind.
+        { id: "queue",   label: "Next in queue",    selector: `${PANEL} > div:last-child:has(> section [data-encore-id="listRow"], > section a[href="/search"]), ${PANEL_V1} > div:has(> ul):not(:has(a[href*="shop.spotify.com"]))` },
         // Spotify DJ replaces the queue list with a "The DJ doesn't have a queue"
         // notice: a heading and one line of text, no list, links or buttons, which
         // no other section is. The condition keeps it to DJ playback anyway.
-        { id: "queuedj", label: "DJ \"no queue\" notice", selector: `${PANEL} > div:has(h2):not(:has(a, ul, button, img, [data-encore-id="listRow"]))`, when: "dj" },
+        { id: "queuedj", label: "DJ \"no queue\" notice", selector: `${PANEL} > div:last-child:has(> section h2):not(:has(a, ul, button, img, [data-encore-id="listRow"])), ${PANEL_V1} > div:has(h2):not(:has(a, ul, button, img, [data-encore-id="listRow"]))`, when: "dj" },
         // Target the container, not the button. The container also holds a skeleton
-        // placeholder (aria-label="Loading", .actionButtonHidden) that keeps its 109px
-        // even once the button is gone, leaving a hole between cover art and title.
-        // Collapsing the container hands that space back to the track info.
-        // The art row is [cover, video container (only on video tracks), title info],
-        // so it's the middle child, and only when something follows it.
-        { id: "video",   label: "Switch to video",   selector: `${PANEL} > :first-child > :first-child > :nth-child(2):not(:last-child)` },
+        // placeholder (aria-label="Loading") beside the button; in 1.3.6 it sits at
+        // ${PANEL} > :first-child above the track title row.
+        { id: "video",   label: "Switch to video",   selector: `${PANEL} > :first-child:has(> div > [aria-hidden="true"] + button), ${PANEL_V1} > :first-child > :first-child > :nth-child(2):not(:last-child)` },
       ],
     },
     {
@@ -206,13 +214,18 @@
       style.id = STYLE_ID;
       document.head.appendChild(style);
     }
-    const baseCSS = 'ul[role="menu"]:has([data-tippy-root]) { overflow: visible !important; }';
+    const baseCSS =
+      'ul[role="menu"]:has([data-tippy-root]) { overflow: visible !important; }\n' +
+      `${PANEL} > div:not(:last-child):has(> section, > div h2) { display: contents; }`;
     if (!isEnabled()) {
       style.textContent = baseCSS;
       return;
     }
     const hidden = ALL.filter(el => isHidden(el.id))
-                      .map(el => guardFor(el) + el.selector);
+                      .map(el => {
+                        const g = guardFor(el);
+                        return g ? `${g}:is(${el.selector})` : el.selector;
+                      });
     style.textContent = hidden.length
       ? baseCSS + "\n" + hidden.join(",\n") + " { display: none !important; }"
       : baseCSS;

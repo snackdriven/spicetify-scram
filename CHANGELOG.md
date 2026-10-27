@@ -6,10 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-10-27
+
 ### Added
 
 - Commitizen commit prompts, SemVer release preparation and CI checks for commit titles and curated release notes.
 
+### Fixed
+
+- **Spotify 1.3.6 `NowPlayingViewV2` (`[data-npv-root]`) support**: Spotify 1.3.6 (`1.3.6.1921`) replaced `.NowPlayingView` and `[data-testid="NPV_Panel_OpenDiv"]` with `NowPlayingViewV2` (`[data-npv-root]`), grouping dynamic cards into a middle flex container and moving Next in queue (which no longer renders a `<ul>`) into a separate `:last-child` wrapper. Updated all Now Playing selectors in `hide-ui-elements.js` (`credits`, `artist`, `tour`, `merch`, `queue`, `queuedj`, `video`) to match the 1.3.6 `[data-npv-root]` hierarchy while keeping the 1.3.5 `.NowPlayingView` selectors as fallbacks, and set `display: contents` on the dynamic-sections wrapper so hiding all dynamic cards leaves no extra 16px flex gap.
+- `snippets/queue-top-side-panel.css`: added `[data-npv-root]` rules alongside the 1.3.5 rules so the track info block (`order: -2`) and Next in queue / DJ notice wrapper (`order: -1`) stay above the dynamic sections on Spotify 1.3.6.
+- `snippets/smaller-right-sidebar-cover.css`: added `[data-npv-root]` grid layout rules for Spotify 1.3.6 alongside the 1.3.5 `.NowPlayingView` rules.
 
 ## [1.3.1] - 2026-10-16
 
@@ -69,7 +76,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 - Wait for `Spicetify.ReactJSX` before registering the menu so `SubMenu.register()` never fails silently on cold start.
 - Collapse the full "Switch to video" container rather than only the button so the adjacent `Loading` placeholder does not leave a 109px gap beside the cover art.
 
-[Unreleased]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/snackdriven/spicetify-scram/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/snackdriven/spicetify-scram/compare/v1.2.0...v1.2.1

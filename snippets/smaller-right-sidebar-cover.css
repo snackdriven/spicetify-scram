@@ -1,12 +1,62 @@
 /* Smaller right sidebar cover art, with the track info moved to its right.
- * Fixed for Spotify 1.3.x, where the old .main-nowPlayingView-* classes are gone.
- * Spotify now hashes nearly every class name, so this anchors on the two hooks that
- * survive builds (.NowPlayingView and data-testid) and walks down by position. */
+ * Fixed for Spotify 1.3.6 (NowPlayingViewV2 / [data-npv-root]) and 1.3.x, where
+ * the old .main-nowPlayingView-* classes are gone. Anchors on [data-npv-root],
+ * .NowPlayingView and data-testid and walks down by position. */
 
 :root {
   --right-sidebar-cover-art-size: 85px;
 }
 
+/* ── Spotify 1.3.6+ (NowPlayingViewV2 / [data-npv-root]) ─────────────────── */
+[data-npv-root] [data-overlayscrollbars-viewport] > div {
+  display: grid !important;
+  grid-template-columns: var(--right-sidebar-cover-art-size) 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  row-gap: 16px;
+  align-items: center;
+  padding-top: 64px !important;
+}
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2) {
+  display: contents !important;
+}
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2) > *,
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2) > div:not(:last-child):has(> section, > div h2) > * {
+  grid-column: 1 / -1;
+}
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :first-child {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: var(--right-sidebar-cover-art-size) !important;
+  min-width: var(--right-sidebar-cover-art-size) !important;
+  height: var(--right-sidebar-cover-art-size) !important;
+  margin: 0 !important;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2) > :not(#SpicyLyricsNPVCard):not(:has(section, h2, [data-testid="skeleton-section"])):not(:first-child:has(> div > [aria-hidden="true"] + button)) {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin-block-end: 0 !important;
+  min-width: 0;
+}
+[data-npv-root]:has([data-overlayscrollbars-viewport] > div > :nth-child(2) > :first-child > div > [aria-hidden="true"] + button) [data-overlayscrollbars-viewport] > div > :nth-child(2) > :nth-child(2) {
+  grid-row: 1;
+}
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2) > :first-child:has(> div > [aria-hidden="true"] + button) {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: start;
+}
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2) > :not(#SpicyLyricsNPVCard):not(:has(section, h2, [data-testid="skeleton-section"])):not(:first-child:has(> div > [aria-hidden="true"] + button)) > :first-child > :nth-child(1) a {
+  font-size: 1.25rem !important;
+}
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2) > :not(#SpicyLyricsNPVCard):not(:has(section, h2, [data-testid="skeleton-section"])):not(:first-child:has(> div > [aria-hidden="true"] + button)) > :first-child > :nth-child(2) a {
+  font-size: 0.85rem !important;
+}
+
+/* ── Spotify 1.3.0-1.3.5 (.NowPlayingView) ───────────────────────────────── */
 /* Row that holds the art block, an optional "Switch to video" button, and the
  * title/artist block (always last). Grid so the button can sit under the title.
  * 1fr auto lets row 2 collapse to 0 when the video container is hidden via display:none,
