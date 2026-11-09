@@ -3,7 +3,7 @@
 *scram*
 
 Spotify's now playing panel keeps accumulating sections and there's no setting for any of them. This
-adds one. Nine, actually.
+adds one. Ten, actually.
 
 <p align="center">
   <img src="preview.png" width="440" alt="The Hide UI elements submenu, with toggles grouped under Now playing and Top bar">
@@ -24,6 +24,9 @@ Switch to video and the Studio button are off by default, as are Merch and the D
 The DJ toggle is the odd one out: it hides the "The DJ doesn't have a queue" panel while Spotify DJ
 is playing, and leaves the normal Next in queue list alone the rest of the time. Same element, two
 toggles.
+
+One toggle changes the layout instead of hiding something: **Layout** > **Smaller cover art** shrinks
+the Now Playing cover to 85px and puts the title and artist beside it. It's off by default.
 
 ## Install
 
