@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Renamed the menu: **Hide UI elements** is now **Scram**, **Enabled** is **Scram is on**, the **Now playing** group is **Right sidebar**, and **Layout** is **Rearrange**. Several toggles got shorter names too. Saved settings carry over.
+
 ## [1.4.0] - 2026-11-09
 
 ### Added
