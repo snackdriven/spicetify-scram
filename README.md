@@ -1,6 +1,5 @@
 # Scram
 
-*scram*
 
 Spotify's now playing panel keeps accumulating sections and there's no setting for any of them. This
 adds one. Ten, actually.
