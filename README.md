@@ -6,26 +6,26 @@ Spotify's now playing panel keeps accumulating sections and there's no setting f
 adds one. Ten, actually.
 
 <p align="center">
-  <img src="preview.png" width="440" alt="The Hide UI elements submenu, with toggles grouped under Now playing and Top bar">
+  <img src="preview.png" width="440" alt="The Scram submenu, with toggles grouped under Right sidebar, Top bar and Rearrange">
 </p>
 
 ## What it turns off
 
 | Group | Elements |
 |---|---|
-| Now playing | Lyrics preview, Credits, About the artist, On tour, Merch, Next in queue, DJ "no queue" notice, Switch to video |
+| Right sidebar | Lyrics peek, Credits, Artist bio, Tour dates, Merch, Up next, DJ's "no queue" note, Video button |
 | Top bar | Studio button |
 
-All under **Hide UI elements** in the Spicetify menu, behind your profile picture. Tick one and it's
-gone, no `spicetify apply` and no restart. Use **Enabled** at the top of the submenu to toggle all
-hiding off and back on at once without losing your individual selections. Lyrics preview, Credits,
-Switch to video and the Studio button are off by default, as are Merch and the DJ notice.
+All under **Scram** in the Spicetify menu, behind your profile picture. Tick one and it's
+gone, no `spicetify apply` and no restart. Use **Scram is on** at the top of the submenu to toggle all
+hiding off and back on at once without losing your individual selections. Lyrics peek, Credits,
+Video button and the Studio button are off by default, as are Merch and the DJ note.
 
 The DJ toggle is the odd one out: it hides the "The DJ doesn't have a queue" panel while Spotify DJ
 is playing, and leaves the normal Next in queue list alone the rest of the time. Same element, two
 toggles.
 
-One toggle changes the layout instead of hiding something: **Layout** > **Smaller cover art** shrinks
+One toggle changes the layout instead of hiding something: **Rearrange** > **Small cover** shrinks
 the Now Playing cover to 85px and puts the title and artist beside it. It's off by default.
 
 ## Install
@@ -53,7 +53,7 @@ just below `GROUPS`: each one stamps true/false on `<html>` and the generated CS
 attribute, so reacting to playback is one attribute write rather than a stylesheet rebuild.
 
 ```js
-{ id: "queuedj", label: "DJ \"no queue\" notice", selector: `${PANEL} > div:last-child:has(> section h2):not(:has(a, ul, button, img, [data-encore-id="listRow"]))`, when: "dj" },
+{ id: "queuedj", label: "DJ's \"no queue\" note", selector: `${PANEL} > div:last-child:has(> section h2):not(:has(a, ul, button, img, [data-encore-id="listRow"]))`, when: "dj" },
 ```
 
 ## Selector notes

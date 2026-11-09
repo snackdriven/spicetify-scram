@@ -3,7 +3,7 @@
 // @description Toggle clutter out of Spotify's now-playing panel and top bar.
 // @author      snackdriven
 //
-// Toggles live in the Spicetify profile menu under "Hide UI elements",
+// Toggles live in the Spicetify profile menu under "Scram",
 // grouped by where in the UI each element actually sits.
 // Changes apply instantly — no reload, no `spicetify apply`.
 //
@@ -148,7 +148,7 @@
 
   const GROUPS = [
     {
-      label: "Now playing",
+      label: "Right sidebar",
       elements: [
         // Spotify 1.3 hashes nearly every class in the now-playing panel, and the
         // old .main-nowPlayingView-* names are gone. In 1.3.6 ([data-npv-root]),
@@ -157,27 +157,27 @@
         // what's inside them: a listRow, a link prefix, an img. No visible text,
         // so any UI language works.
         // Lyrics: Spotify's own preview card, or the Spicy Lyrics card that replaces it.
-        { id: "lyrics",  label: "Lyrics preview",   selector: '#SpicyLyricsNPVCard, [data-testid="lyrics-npv-section"]' },
+        { id: "lyrics",  label: "Lyrics peek", selector: '#SpicyLyricsNPVCard, [data-testid="lyrics-npv-section"]' },
         // In 1.3.6 Credits is a <section> with listRows and no images (unlike
         // RelatedAudioTracksSection and NextInQueueSection, whose rows carry cover art).
         { id: "credits", label: "Credits",          selector: `${PANEL} > div > section:has([data-encore-id="listRow"]):not(:has(img)), ${PANEL_V1} > div:has([data-encore-id="listRow"]):not(:has(ul))` },
         // Exclude [role="presentation"] so RelatedVideosCarousel (which also links to /artist/) doesn't match.
-        { id: "artist",  label: "About the artist", selector: `${PANEL} > div > div:has(h2):has(a[href^="/artist/"]):not(:has(ul, [data-encore-id="listRow"], [role="presentation"])), ${PANEL_V1} > div:has(h2):has(a[href^="/artist/"]):not(:has(ul, [data-encore-id="listRow"]))` },
-        { id: "tour",    label: "On tour",          selector: `${PANEL} > div > div:has(a[href^="/concert/"]), ${PANEL_V1} > div:has(a[href^="/concert/"])` },
+        { id: "artist",  label: "Artist bio", selector: `${PANEL} > div > div:has(h2):has(a[href^="/artist/"]):not(:has(ul, [data-encore-id="listRow"], [role="presentation"])), ${PANEL_V1} > div:has(h2):has(a[href^="/artist/"]):not(:has(ul, [data-encore-id="listRow"]))` },
+        { id: "tour",    label: "Tour dates", selector: `${PANEL} > div > div:has(a[href^="/concert/"]), ${PANEL_V1} > div:has(a[href^="/concert/"])` },
         // Merch's only stable trait is where its product links point.
         { id: "merch",   label: "Merch",            selector: `${PANEL} > div > div:has(a[href*="shop.spotify.com"]), ${PANEL_V1} > div:has(a[href*="shop.spotify.com"])` },
         // 1.3.6 dropped the <ul> from Next in queue: it's the static wrapper
         // (${PANEL} > div:last-child) holding either track listRows or an empty-queue
         // /search link. Hide the wrapper itself so no 16px flex gap stays behind.
-        { id: "queue",   label: "Next in queue",    selector: `${PANEL} > div:last-child:has(> section [data-encore-id="listRow"], > section a[href="/search"]), ${PANEL_V1} > div:has(> ul):not(:has(a[href*="shop.spotify.com"]))` },
+        { id: "queue",   label: "Up next", selector: `${PANEL} > div:last-child:has(> section [data-encore-id="listRow"], > section a[href="/search"]), ${PANEL_V1} > div:has(> ul):not(:has(a[href*="shop.spotify.com"]))` },
         // Spotify DJ replaces the queue list with a "The DJ doesn't have a queue"
         // notice: a heading and one line of text, no list, links or buttons, which
         // no other section is. The condition keeps it to DJ playback anyway.
-        { id: "queuedj", label: "DJ \"no queue\" notice", selector: `${PANEL} > div:last-child:has(> section h2):not(:has(a, ul, button, img, [data-encore-id="listRow"])), ${PANEL_V1} > div:has(h2):not(:has(a, ul, button, img, [data-encore-id="listRow"]))`, when: "dj" },
+        { id: "queuedj", label: "DJ's \"no queue\" note", selector: `${PANEL} > div:last-child:has(> section h2):not(:has(a, ul, button, img, [data-encore-id="listRow"])), ${PANEL_V1} > div:has(h2):not(:has(a, ul, button, img, [data-encore-id="listRow"]))`, when: "dj" },
         // Target the container, not the button. The container also holds a skeleton
         // placeholder (aria-label="Loading") beside the button; in 1.3.6 it sits at
         // ${PANEL} > :first-child above the track title row.
-        { id: "video",   label: "Switch to video",   selector: `${PANEL} > :first-child:has(> div > [aria-hidden="true"] + button), ${PANEL_V1} > :first-child > :first-child > :nth-child(2):not(:last-child)` },
+        { id: "video",   label: "Video button", selector: `${PANEL} > :first-child:has(> div > [aria-hidden="true"] + button), ${PANEL_V1} > :first-child > :first-child > :nth-child(2):not(:last-child)` },
       ],
     },
     {
@@ -189,10 +189,10 @@
       ],
     },
     {
-      label: "Layout",
+      label: "Rearrange",
       elements: [
         // `css` instead of `selector`: the toggle adds these rules rather than hiding anything.
-        { id: "smallcover", label: "Smaller cover art", css: SMALL_COVER_CSS },
+        { id: "smallcover", label: "Small cover", css: SMALL_COVER_CSS },
       ],
     },
   ];
@@ -260,7 +260,7 @@
   const STORAGE_PREFIX = "hide-ui-elements:";
   const ENABLED_KEY = STORAGE_PREFIX + "enabled";
   const STYLE_ID = "hide-ui-elements-style";
-  const MENU_LABEL = "Hide UI elements";
+  const MENU_LABEL = "Scram";
 
   // This started life as two separate extensions with their own storage keys.
   // Carry those settings over rather than silently resetting them.
@@ -374,7 +374,7 @@
   }
 
   function registerMenu() {
-    const masterToggle = new Spicetify.Menu.Item("Enabled", isEnabled(), self => {
+    const masterToggle = new Spicetify.Menu.Item("Scram is on", isEnabled(), self => {
       const next = !isEnabled();
       setEnabled(next);
       self.setState(next);
