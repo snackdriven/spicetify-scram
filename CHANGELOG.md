@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-09
+
 ### Added
 
 - **Layout** > **Smaller cover art** toggle (off by default): an 85px Now Playing cover with the title and artist beside it, built into the extension so it no longer depends on a Marketplace snippet. If you have the Marketplace `Smaller right sidebar cover art` snippet installed, remove it or it will keep applying with the toggle off.
@@ -80,7 +82,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 - Wait for `Spicetify.ReactJSX` before registering the menu so `SubMenu.register()` never fails silently on cold start.
 - Collapse the full "Switch to video" container rather than only the button so the adjacent `Loading` placeholder does not leave a 109px gap beside the cover art.
 
-[Unreleased]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.2...HEAD
+[Unreleased]: https://github.com/snackdriven/spicetify-scram/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.2...v1.4.0
 [1.3.2]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/snackdriven/spicetify-scram/compare/v1.2.1...v1.3.0
