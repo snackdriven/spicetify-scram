@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **Rearrange** > **Lyrics size buttons** toggle (off by default): adds A− and A+ buttons to the Spicy Lyrics card in the right sidebar, plus a button that cycles the card through regular, medium and medium XL heights. Your choices are remembered between launches, and full-screen lyrics aren't affected.
+
+### Fixed
+
+- The right sidebar's title now says **DJ** during Spotify DJ playback, where Spotify leaves it blank.
+
 ## [1.4.1] - 2026-11-09
 
 ### Changed

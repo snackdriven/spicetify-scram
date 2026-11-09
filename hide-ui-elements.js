@@ -193,6 +193,8 @@
       elements: [
         // `css` instead of `selector`: the toggle adds these rules rather than hiding anything.
         { id: "smallcover", label: "Small cover", css: SMALL_COVER_CSS },
+        // A function, because the rules depend on the size picked with the buttons.
+        { id: "lyricsize", label: "Lyrics size buttons", css: lyricSizeCSS },
       ],
     },
   ];
@@ -334,6 +336,7 @@
   // ---------------------------------------------------------------------------
 
   function applyCSS() {
+    syncLyricSizeButtons();
     let style = document.getElementById(STYLE_ID);
     if (!style) {
       style = document.createElement("style");
@@ -342,7 +345,10 @@
     }
     const baseCSS =
       'ul[role="menu"]:has([data-tippy-root]) { overflow: visible !important; }\n' +
-      `${PANEL} > div:not(:last-child):has(> section, > div h2) { display: contents; }`;
+      `${PANEL} > div:not(:last-child):has(> section, > div h2) { display: contents; }\n` +
+      // Spotify leaves the sidebar's title slot empty during DJ playback. :empty
+      // keeps this out of the way if Spotify ever starts filling it in.
+      'html[data-hide-ui-dj="true"] [data-npv-root] > :first-child > :nth-child(2) > :first-child:empty::before { content: "DJ"; display: block; font-size: 1rem; font-weight: 700; color: var(--spice-text); }';
     if (!isEnabled()) {
       style.textContent = baseCSS;
       return;
@@ -355,7 +361,7 @@
                          });
     const parts = [baseCSS];
     if (hidden.length) parts.push(hidden.join(",\n") + " { display: none !important; }");
-    active.forEach(el => { if (el.css) parts.push(el.css); });
+    active.forEach(el => { if (el.css) parts.push(typeof el.css === "function" ? el.css() : el.css); });
     style.textContent = parts.join("\n");
   }
 
@@ -363,6 +369,183 @@
   // Menu — a master toggle plus a submenu per group, nested inside one
   // top-level entry. Spicetify handles SubMenus containing SubMenus fine.
   // ---------------------------------------------------------------------------
+
+  // ---------------------------------------------------------------------------
+  // Lyrics size buttons: A- and A+ in the Spicy Lyrics sidebar card header.
+  // Spicy Lyrics sizes lines from --DefaultLyricsSize and re-measures its
+  // virtualized list when that changes. Unsynced lyrics set their own copy of
+  // the variable, so both places need the override.
+  // ---------------------------------------------------------------------------
+  const LYRIC_SIZE_KEY = STORAGE_PREFIX + "lyricsize-px";
+  const LYRIC_SIZE_MIN = 14;
+  const LYRIC_SIZE_MAX = 44;
+  const LYRIC_SIZE_STEP = 2;
+  const LYRIC_MEDIUM_KEY = STORAGE_PREFIX + "lyricmedium";
+
+  function getLyricSize() {
+    try {
+      const px = parseFloat(localStorage.getItem(LYRIC_SIZE_KEY));
+      return px >= LYRIC_SIZE_MIN && px <= LYRIC_SIZE_MAX ? px : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // "" (regular), "medium" or "xl". Builds with a single medium step stored "true".
+  function getLyricCardSize() {
+    try {
+      const stored = localStorage.getItem(LYRIC_MEDIUM_KEY);
+      if (stored === "true" || stored === "medium") return "medium";
+      return stored === "xl" ? "xl" : "";
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function lyricSizeCSS() {
+    const parts = [
+      "#SpicyLyricsNPVCard .scram-lyric-size { width: 32px; height: 32px; font-family: inherit; font-weight: 700; font-size: 12px; line-height: 1; }",
+      "#scram-lyric-larger { font-size: 14px; }",
+      ".scram-lyric-size:disabled { opacity: 0.35; }",
+      "#scram-lyric-medium.is-on { background: rgba(255, 255, 255, 0.2); }",
+      "#scram-lyric-medium.is-xl svg { display: none; }",
+      '#scram-lyric-medium.is-xl::after { content: "XL"; font-size: 11px; }',
+      "#SpicyLyricsNPVCard:is(.Expanded, .Collapsed) #scram-lyric-medium { opacity: 0.35; pointer-events: none; }",
+      "#SpicyLyricsNPVCard .CardTitle { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }",
+      "#SpicyLyricsNPVCard .CardControls { flex-shrink: 0; }",
+    ];
+    const px = getLyricSize();
+    if (px !== null) {
+      parts.push(
+        '#SpicyLyricsNPVCard #SpicyLyricsPage .LyricsContainer .LyricsContent,\n' +
+        '#SpicyLyricsNPVCard #SpicyLyricsPage.SpicyRenderer .LyricsContainer .SpicyLyricsScrollContainer[data-lyrics-type="Static"] ' +
+        `{ --DefaultLyricsSize: ${px}px !important; }`
+      );
+    }
+    const cardSize = getLyricCardSize();
+    if (cardSize) {
+      // Both sit between Spicy Lyrics' regular 255px body and its Expanded mode.
+      const height = cardSize === "xl" ? "clamp(400px, 36vh, 530px)" : "clamp(320px, 30vh, 460px)";
+      parts.push(
+        "#SpicyLyricsNPVCard:not(.Expanded):not(.Collapsed) { max-height: none; }",
+        `#SpicyLyricsNPVCard:not(.Expanded):not(.Collapsed) .CardBody { height: ${height}; }`
+      );
+    }
+    return parts.join("\n");
+  }
+
+  function cycleLyricCardSize() {
+    const next = { "": "medium", medium: "xl", xl: "" }[getLyricCardSize()];
+    try {
+      localStorage.setItem(LYRIC_MEDIUM_KEY, next);
+    } catch (e) {
+      // Blocked storage: nothing to remember the choice in.
+    }
+    applyCSS();
+  }
+
+  function makeLyricMediumButton() {
+    const button = document.createElement("button");
+    button.id = "scram-lyric-medium";
+    button.type = "button";
+    button.className = "CardControl scram-lyric-size";
+    button.setAttribute("aria-label", "Change lyrics card height");
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "NoFill");
+    svg.setAttribute("viewBox", "0 0 18 18");
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("stroke", "currentColor");
+    svg.setAttribute("stroke-width", "1.6");
+    svg.setAttribute("stroke-linecap", "round");
+    for (const d of ["M3 3h12", "M3 15h12", "M6 7.5h6", "M6 10.5h6"]) {
+      const path = document.createElementNS(svgNS, "path");
+      path.setAttribute("d", d);
+      svg.appendChild(path);
+    }
+    button.appendChild(svg);
+    button.addEventListener("click", event => {
+      event.stopPropagation();
+      cycleLyricCardSize();
+    });
+    return button;
+  }
+
+  function currentLyricSize() {
+    const stored = getLyricSize();
+    if (stored !== null) return stored;
+    const line = document.querySelector("#SpicyLyricsNPVCard .LyricsContent .line");
+    return (line && parseFloat(getComputedStyle(line).fontSize)) || 30;
+  }
+
+  function nudgeLyricSize(direction) {
+    const next = Math.round(currentLyricSize() + direction * LYRIC_SIZE_STEP);
+    const px = Math.min(LYRIC_SIZE_MAX, Math.max(LYRIC_SIZE_MIN, next));
+    try {
+      localStorage.setItem(LYRIC_SIZE_KEY, String(px));
+    } catch (e) {
+      // Blocked storage: nothing to remember the size in.
+    }
+    applyCSS();
+  }
+
+  function makeLyricSizeButton(id, text, label, direction) {
+    const button = document.createElement("button");
+    button.id = id;
+    button.type = "button";
+    button.className = "CardControl scram-lyric-size";
+    button.textContent = text;
+    button.title = label;
+    button.setAttribute("aria-label", label);
+    button.addEventListener("click", event => {
+      event.stopPropagation();
+      nudgeLyricSize(direction);
+    });
+    return button;
+  }
+
+  function syncLyricSizeButtons() {
+    const existing = document.querySelectorAll(".scram-lyric-size");
+    if (!isEnabled() || !isHidden("lyricsize")) {
+      existing.forEach(button => button.remove());
+      return;
+    }
+    if (!existing.length) {
+      const controls = document.querySelector("#SpicyLyricsNPVCard .CardControls");
+      if (!controls) return;
+      controls.prepend(
+        makeLyricSizeButton("scram-lyric-smaller", "A−", "Smaller lyrics", -1),
+        makeLyricSizeButton("scram-lyric-larger", "A+", "Larger lyrics", 1),
+        makeLyricMediumButton()
+      );
+    }
+    const medium = document.getElementById("scram-lyric-medium");
+    if (medium) {
+      const cardSize = getLyricCardSize();
+      medium.classList.toggle("is-on", cardSize !== "");
+      medium.classList.toggle("is-xl", cardSize === "xl");
+      medium.title = { "": "Lyrics card: regular", medium: "Lyrics card: medium", xl: "Lyrics card: medium XL" }[cardSize];
+    }
+    const px = getLyricSize();
+    const smaller = document.getElementById("scram-lyric-smaller");
+    const larger = document.getElementById("scram-lyric-larger");
+    if (smaller) smaller.disabled = px !== null && px <= LYRIC_SIZE_MIN;
+    if (larger) larger.disabled = px !== null && px >= LYRIC_SIZE_MAX;
+  }
+
+  // Spicy Lyrics rebuilds the card on its own schedule, so put the buttons back
+  // whenever it does. Coalesced to one check per frame.
+  function watchLyricCard() {
+    let queued = false;
+    new MutationObserver(() => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        syncLyricSizeButtons();
+      });
+    }).observe(document.documentElement, { childList: true, subtree: true });
+  }
 
   function makeItem(el) {
     return new Spicetify.Menu.Item(el.label, isHidden(el.id), self => {
@@ -511,5 +694,6 @@
   } else {
     document.addEventListener("DOMContentLoaded", applyCSS, { once: true });
   }
+  watchLyricCard();
   initMenu();
 })();
