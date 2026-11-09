@@ -2,7 +2,7 @@
 
 
 Spotify's now playing panel keeps accumulating sections and there's no setting for any of them. This
-adds one. Ten, actually.
+adds one. Eleven, actually.
 
 <p align="center">
   <img src="preview.png" width="440" alt="The Scram submenu, with toggles grouped under Right sidebar, Top bar and Rearrange">
@@ -17,7 +17,7 @@ it's gone, no restart.
 |---|---|
 | Right sidebar | Lyrics peek, Credits, Artist bio, Tour dates, Merch, Up next, DJ's "no queue" note, Video button |
 | Top bar | Studio button |
-| Rearrange | Small cover (85px, with the title beside it) |
+| Rearrange | Small cover (85px, with the title beside it), Lyrics size buttons (A−, A+ and medium or medium XL card heights on the Spicy Lyrics sidebar card) |
 
 **Scram is on** turns it all off and back on without losing your picks.
 
