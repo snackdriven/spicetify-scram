@@ -27,6 +27,125 @@
   // both layouts work across 1.3.x builds and rollout flags.
   const PANEL = '[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2)';
   const PANEL_V1 = '.NowPlayingView [data-testid="NPV_Panel_OpenDiv"]';
+
+  // Layout toggle: 85px Now Playing cover with the track info beside it. Same
+  // rules as snippets/smaller-right-sidebar-cover.css, built in so a Marketplace
+  // reinstall can't swap them for the stock snippet with its dead selectors.
+  const SMALL_COVER_CSS = `
+:root {
+  --right-sidebar-cover-art-size: 85px;
+}
+
+/* Spotify 1.3.6+ (NowPlayingViewV2 / [data-npv-root]) */
+[data-npv-root] [data-overlayscrollbars-viewport] > div {
+  display: grid !important;
+  grid-template-columns: var(--right-sidebar-cover-art-size) 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  row-gap: 16px;
+  align-items: center;
+  padding-top: 64px !important;
+}
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2) {
+  display: contents !important;
+}
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2) > *,
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2) > div:not(:last-child):has(> section, > div h2) > * {
+  grid-column: 1 / -1;
+}
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :first-child {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: var(--right-sidebar-cover-art-size) !important;
+  min-width: var(--right-sidebar-cover-art-size) !important;
+  height: var(--right-sidebar-cover-art-size) !important;
+  margin: 0 !important;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2) > :not(#SpicyLyricsNPVCard):not(:has(section, h2, [data-testid="skeleton-section"])):not(:first-child:has(> div > [aria-hidden="true"] + button)) {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin-block-end: 0 !important;
+  min-width: 0;
+}
+[data-npv-root]:has([data-overlayscrollbars-viewport] > div > :nth-child(2) > :first-child > div > [aria-hidden="true"] + button) [data-overlayscrollbars-viewport] > div > :nth-child(2) > :nth-child(2) {
+  grid-row: 1;
+}
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2) > :first-child:has(> div > [aria-hidden="true"] + button) {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: start;
+}
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2) > :not(#SpicyLyricsNPVCard):not(:has(section, h2, [data-testid="skeleton-section"])):not(:first-child:has(> div > [aria-hidden="true"] + button)) > :first-child > :nth-child(1) a {
+  font-size: 1.25rem !important;
+}
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2) > :not(#SpicyLyricsNPVCard):not(:has(section, h2, [data-testid="skeleton-section"])):not(:first-child:has(> div > [aria-hidden="true"] + button)) > :first-child > :nth-child(2) a {
+  font-size: 0.85rem !important;
+}
+
+/* Spotify 1.3.0-1.3.5 (.NowPlayingView) */
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child {
+  display: grid !important;
+  grid-template-columns: var(--right-sidebar-cover-art-size) 1fr;
+  grid-template-rows: 1fr auto;
+  align-items: center;
+  column-gap: 12px;
+}
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :last-child {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+}
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :last-child:nth-child(2) {
+  grid-row: 1 / span 2;
+}
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :nth-child(2):not(:last-child) {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: start;
+}
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :first-child {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: var(--right-sidebar-cover-art-size) !important;
+  min-width: var(--right-sidebar-cover-art-size) !important;
+  height: var(--right-sidebar-cover-art-size) !important;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+.NowPlayingView [data-testid="track-visual-enhancement"] {
+  inset: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+.NowPlayingView [data-testid="track-visual-enhancement"] * {
+  max-width: 100%;
+}
+.NowPlayingView [data-testid="minimized-track-visual-enhancement"] {
+  display: none !important;
+}
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :last-child > :nth-child(2) > :nth-child(1) a {
+  font-size: 1.25rem !important;
+}
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :last-child > :nth-child(2) > :nth-child(3) a {
+  font-size: 0.85rem !important;
+}
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :last-child::before {
+  display: none !important;
+}
+.NowPlayingView > div > :first-child,
+.NowPlayingView .main-nowPlayingView-headerWrapper {
+  position: relative !important;
+  inset: auto !important;
+}
+.NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child > :first-child {
+  margin: 0 !important;
+}`;
+
   const GROUPS = [
     {
       label: "Now playing",
@@ -67,6 +186,13 @@
         // Spotify 1.3.5 hashed .main-actionButtons; Studio is the only dialog button
         // in #global-nav-bar, wrapped in a <span> whose flex gap lingers unless hidden too.
         { id: "studio",  label: "Studio button",    selector: '#global-nav-bar :has(> button[aria-haspopup="dialog"]), #global-nav-bar button[aria-haspopup="dialog"], .main-actionButtons button[aria-haspopup="dialog"]' },
+      ],
+    },
+    {
+      label: "Layout",
+      elements: [
+        // `css` instead of `selector`: the toggle adds these rules rather than hiding anything.
+        { id: "smallcover", label: "Smaller cover art", css: SMALL_COVER_CSS },
       ],
     },
   ];
@@ -221,14 +347,16 @@
       style.textContent = baseCSS;
       return;
     }
-    const hidden = ALL.filter(el => isHidden(el.id))
-                      .map(el => {
-                        const g = guardFor(el);
-                        return g ? `${g}:is(${el.selector})` : el.selector;
-                      });
-    style.textContent = hidden.length
-      ? baseCSS + "\n" + hidden.join(",\n") + " { display: none !important; }"
-      : baseCSS;
+    const active = ALL.filter(el => isHidden(el.id));
+    const hidden = active.filter(el => el.selector)
+                         .map(el => {
+                           const g = guardFor(el);
+                           return g ? `${g}:is(${el.selector})` : el.selector;
+                         });
+    const parts = [baseCSS];
+    if (hidden.length) parts.push(hidden.join(",\n") + " { display: none !important; }");
+    active.forEach(el => { if (el.css) parts.push(el.css); });
+    style.textContent = parts.join("\n");
   }
 
   // ---------------------------------------------------------------------------

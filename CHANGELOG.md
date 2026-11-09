@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **Layout** > **Smaller cover art** toggle (off by default): an 85px Now Playing cover with the title and artist beside it, built into the extension so it no longer depends on a Marketplace snippet. If you have the Marketplace `Smaller right sidebar cover art` snippet installed, remove it or it will keep applying with the toggle off.
+
 ## [1.3.2] - 2026-10-27
 
 ### Added
