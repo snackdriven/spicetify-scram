@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-11-09
+
 ### Added
 
 - **Rearrange** > **Lyrics size buttons** toggle (off by default): adds A− and A+ buttons to the Spicy Lyrics card in the right sidebar, plus a button that cycles the card through regular, medium and medium XL heights. Your choices are remembered between launches, and full-screen lyrics aren't affected.
@@ -96,7 +98,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 - Wait for `Spicetify.ReactJSX` before registering the menu so `SubMenu.register()` never fails silently on cold start.
 - Collapse the full "Switch to video" container rather than only the button so the adjacent `Loading` placeholder does not leave a 109px gap beside the cover art.
 
-[Unreleased]: https://github.com/snackdriven/spicetify-scram/compare/v1.4.1...HEAD
+[Unreleased]: https://github.com/snackdriven/spicetify-scram/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/snackdriven/spicetify-scram/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/snackdriven/spicetify-scram/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.2...v1.4.0
 [1.3.2]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.1...v1.3.2
