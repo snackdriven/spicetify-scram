@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-11-09
+
 ### Changed
 
 - Renamed the menu: **Hide UI elements** is now **Scram**, **Enabled** is **Scram is on**, the **Now playing** group is **Right sidebar**, and **Layout** is **Rearrange**. Several toggles got shorter names too. Saved settings carry over.
@@ -86,7 +88,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 - Wait for `Spicetify.ReactJSX` before registering the menu so `SubMenu.register()` never fails silently on cold start.
 - Collapse the full "Switch to video" container rather than only the button so the adjacent `Loading` placeholder does not leave a 109px gap beside the cover art.
 
-[Unreleased]: https://github.com/snackdriven/spicetify-scram/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/snackdriven/spicetify-scram/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/snackdriven/spicetify-scram/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.2...v1.4.0
 [1.3.2]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.0...v1.3.1
