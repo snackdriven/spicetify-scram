@@ -1,5 +1,5 @@
 // @name        Hide UI Elements
-// @version     1.4.1
+// @version     1.5.0
 // @description Toggle clutter out of Spotify's now-playing panel and top bar.
 // @author      snackdriven
 //
