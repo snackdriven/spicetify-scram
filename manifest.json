@@ -1,5 +1,5 @@
 {
-  "name": "Hide UI Elements",
+  "name": "Scram",
   "description": "Toggle clutter out of Spotify's now-playing panel and top bar from the Spicetify menu.",
   "preview": "preview.png",
   "main": "hide-ui-elements.js",
