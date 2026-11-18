@@ -61,6 +61,13 @@
  * title/artist block (always last). Grid so the button can sit under the title.
  * 1fr auto lets row 2 collapse to 0 when the video container is hidden via display:none,
  * so the title centers against the 85px cover either way. */
+/* Themes that float the cover (Mirage's m-levitate) shift it inside the 85px
+ * clipped box, which reads as a bounce. Spotify 1.3.10 brought back the
+ * .main-nowPlayingView-coverArtContainer class those rules target. */
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :first-child img {
+  animation: none !important;
+}
+
 .NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child {
   display: grid !important;
   grid-template-columns: var(--right-sidebar-cover-art-size) 1fr;

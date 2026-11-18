@@ -100,6 +100,13 @@ ${DJ_BUTTON} svg {
   font-size: 0.85rem !important;
 }
 
+/* Themes that float the cover (Mirage's m-levitate) shift it inside the 85px
+ * clipped box, which reads as a bounce. Spotify 1.3.10 brought back the
+ * .main-nowPlayingView-coverArtContainer class those rules target. */
+[data-npv-root] [data-overlayscrollbars-viewport] > div > :first-child img {
+  animation: none !important;
+}
+
 /* Spotify 1.3.0-1.3.5 (.NowPlayingView) */
 .NowPlayingView [data-testid="NPV_Panel_OpenDiv"] > :first-child > :first-child {
   display: grid !important;
