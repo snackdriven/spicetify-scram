@@ -46,7 +46,7 @@ say what each selector keys off.
 
 ## Also
 
-`snippets/` has CSS repairs for Marketplace snippets that broke on Spotify 1.3.x.
+`snippets/` has CSS repairs for Marketplace snippets that broke on Spotify 1.3.x, plus small theme fixes like the DJ button colors.
 [RELEASE.md](RELEASE.md) covers commits and versioning, and [CHANGELOG.md](CHANGELOG.md) has the history.
 
 ## License

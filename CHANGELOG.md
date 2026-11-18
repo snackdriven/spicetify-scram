@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- New `snippets/dj-button-theme-colors.css`: the DJ button at the right of the playback bar uses your theme's accent instead of Spotify's fixed blue and green. Add it as a Marketplace snippet; the extension itself doesn't change.
+
 ## [1.5.0] - 2026-11-09
 
 ### Added
