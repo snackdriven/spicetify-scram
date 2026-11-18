@@ -28,6 +28,21 @@
   const PANEL = '[data-npv-root] [data-overlayscrollbars-viewport] > div > :nth-child(2)';
   const PANEL_V1 = '.NowPlayingView [data-testid="NPV_Panel_OpenDiv"]';
 
+  // Recolor toggle: Spotify writes the playback bar DJ button's blue background and
+  // green icon as inline styles, so themes can't reach it without !important. The
+  // button has no aria-label or data-testid, so it's matched by the start of its icon
+  // path. Same rules as snippets/dj-button-theme-colors.css.
+  const DJ_BUTTON = '.main-nowPlayingBar-extraControls button:has(svg path[d^="M7.813 14.497"])';
+  const DJ_BUTTON_CSS = `
+${DJ_BUTTON} {
+  background: var(--spice-button) !important;
+  outline-color: var(--spice-button) !important;
+}
+${DJ_BUTTON} svg {
+  color: var(--spice-main) !important;
+  fill: currentColor !important;
+}`;
+
   // Layout toggle: 85px Now Playing cover with the track info beside it. Same
   // rules as snippets/smaller-right-sidebar-cover.css, built in so a Marketplace
   // reinstall can't swap them for the stock snippet with its dead selectors.
@@ -195,6 +210,12 @@
         { id: "smallcover", label: "Small cover", css: SMALL_COVER_CSS },
         // A function, because the rules depend on the size picked with the buttons.
         { id: "lyricsize", label: "Lyrics size buttons", css: lyricSizeCSS },
+      ],
+    },
+    {
+      label: "Recolor",
+      elements: [
+        { id: "djcolor", label: "DJ button", css: DJ_BUTTON_CSS },
       ],
     },
   ];
