@@ -5,7 +5,8 @@
  * icon, the snippet stops matching and the button goes back to blue.
  *
  * Colors come from the active theme: --spice-button for the circle and --spice-main for
- * the icon, the same pair the theme's play buttons use. */
+ * the icon, the same pair the theme's play buttons use. Scram has this built in as
+ * Recolor > DJ button; use one or the other. */
 .main-nowPlayingBar-extraControls button:has(svg path[d^="M7.813 14.497"]) {
   background: var(--spice-button) !important;
   outline-color: var(--spice-button) !important;
