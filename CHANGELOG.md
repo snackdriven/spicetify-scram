@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 - **Recolor** > **DJ button** toggle (off by default): the DJ button at the right of the playback bar uses your theme's accent instead of Spotify's fixed blue and green. The same rules are in `snippets/dj-button-theme-colors.css`; if you installed that as a Marketplace snippet, remove it or it will keep applying with the toggle off.
 
+### Fixed
+
+- **Small cover** no longer bounces with themes that float the cover art, like Mirage. Spotify 1.3.10 brought back a class name those theme rules use, and the float looked like a bounce inside the smaller box.
+
 ## [1.5.0] - 2026-11-09
 
 ### Added
