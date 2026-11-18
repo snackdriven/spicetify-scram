@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-11-18
+
 ### Added
 
 - **Recolor** > **DJ button** toggle (off by default): the DJ button at the right of the playback bar uses your theme's accent instead of Spotify's fixed blue and green. The same rules are in `snippets/dj-button-theme-colors.css`; if you installed that as a Marketplace snippet, remove it or it will keep applying with the toggle off.
@@ -106,7 +108,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 - Wait for `Spicetify.ReactJSX` before registering the menu so `SubMenu.register()` never fails silently on cold start.
 - Collapse the full "Switch to video" container rather than only the button so the adjacent `Loading` placeholder does not leave a 109px gap beside the cover art.
 
-[Unreleased]: https://github.com/snackdriven/spicetify-scram/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/snackdriven/spicetify-scram/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/snackdriven/spicetify-scram/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/snackdriven/spicetify-scram/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/snackdriven/spicetify-scram/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/snackdriven/spicetify-scram/compare/v1.3.2...v1.4.0
