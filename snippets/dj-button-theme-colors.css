@@ -1,0 +1,17 @@
+/* The DJ button at the right of the playback bar ignores the theme on Spotify 1.3.8.
+ * Spotify writes its blue background (rgb(10, 89, 184)) and green icon as inline styles,
+ * so theme colors can't reach it without !important. The button has no aria-label or
+ * data-testid, so this matches it by the start of its icon path. If Spotify redraws that
+ * icon, the snippet stops matching and the button goes back to blue.
+ *
+ * Colors come from the active theme: --spice-button for the circle and --spice-main for
+ * the icon, the same pair the theme's play buttons use. */
+.main-nowPlayingBar-extraControls button:has(svg path[d^="M7.813 14.497"]) {
+  background: var(--spice-button) !important;
+  outline-color: var(--spice-button) !important;
+}
+
+.main-nowPlayingBar-extraControls button:has(svg path[d^="M7.813 14.497"]) svg {
+  color: var(--spice-main) !important;
+  fill: currentColor !important;
+}
